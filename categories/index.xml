@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on Donne blog</title>
+    <title>Categories on HGL blog</title>
     <link>https://hgl-pong.github.io/categories/</link>
-    <description>Recent content in Categories on Donne blog</description>
+    <description>Recent content in Categories on HGL blog</description>
     <generator>Hugo -- gohugo.io</generator>
     
         <atom:link href="https://hgl-pong.github.io/categories/index.xml" rel="self" type="application/rss+xml" />

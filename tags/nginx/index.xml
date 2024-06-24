@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Nginx on Donne blog</title>
+    <title>Nginx on HGL blog</title>
     <link>https://hgl-pong.github.io/tags/nginx/</link>
-    <description>Recent content in Nginx on Donne blog</description>
+    <description>Recent content in Nginx on HGL blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Thu, 30 May 2019 17:25:20 +0800</lastBuildDate>
     

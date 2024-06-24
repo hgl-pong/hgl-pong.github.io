@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Donne blog</title>
+    <title>HGL blog</title>
     <link>https://hgl-pong.github.io/</link>
-    <description>Recent content on Donne blog</description>
+    <description>Recent content on HGL blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Wed, 22 Apr 2020 09:57:00 +0800</lastBuildDate>
     
