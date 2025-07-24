@@ -1,13 +1,9 @@
-name: Build and Deploy Next.js
+name: Deploy Next.js to GitHub Pages
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
-# 禁用默认的Pages构建
-env:
-  SKIP_JEKYLL: true
 
 permissions:
   contents: read
@@ -19,13 +15,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -36,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Next.js
+      - name: Build with Next.js
         run: npm run build
 
       - name: Setup Pages
@@ -47,6 +41,13 @@ jobs:
         with:
           path: ./out
 
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
