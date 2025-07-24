@@ -1,9 +1,13 @@
-name: Deploy Next.js to GitHub Pages
+name: Build and Deploy Next.js
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
+# 禁用默认的Pages构建
+env:
+  SKIP_JEKYLL: true
 
 permissions:
   contents: read
@@ -20,6 +24,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
