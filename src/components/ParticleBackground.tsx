@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import Particles from 'react-particles'
 import { loadSlim } from 'tsparticles-slim'
-import type { Container, Engine } from 'tsparticles-engine'
+import type { Container, Engine, MoveDirection, OutMode } from 'tsparticles-engine'
 
 interface ParticleBackgroundProps {
   className?: string
@@ -64,10 +64,10 @@ export default function ParticleBackground({
           width: 1,
         },
         move: {
-          direction: 'none',
+          direction: "none" as MoveDirection,
           enable: true,
           outModes: {
-            default: 'bounce',
+            default: "bounce" as OutMode,
           },
           random: false,
           speed: 1,
@@ -125,7 +125,7 @@ export default function ParticleBackground({
           },
           move: {
             ...baseConfig.particles.move,
-            direction: 'bottom',
+            direction: "bottom" as MoveDirection,
             speed: 3,
           },
           links: {

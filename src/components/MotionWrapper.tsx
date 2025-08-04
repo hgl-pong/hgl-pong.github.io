@@ -33,14 +33,9 @@ export default function MotionWrapper({
             opacity: 1,
             x: 0,
             y: 0,
-            transition: {
-              duration,
-              delay,
-              ease: [0.25, 0.46, 0.45, 0.94],
-            },
           },
         }
-      
+
       case 'scale':
         return {
           hidden: {
@@ -50,14 +45,9 @@ export default function MotionWrapper({
           visible: {
             opacity: 1,
             scale: 1,
-            transition: {
-              duration,
-              delay,
-              ease: [0.25, 0.46, 0.45, 0.94],
-            },
           },
         }
-      
+
       case 'rotate':
         return {
           hidden: {
@@ -69,14 +59,9 @@ export default function MotionWrapper({
             opacity: 1,
             rotate: 0,
             scale: 1,
-            transition: {
-              duration,
-              delay,
-              ease: [0.25, 0.46, 0.45, 0.94],
-            },
           },
         }
-      
+
       case 'glitch':
         return {
           hidden: {
@@ -88,14 +73,9 @@ export default function MotionWrapper({
             opacity: 1,
             x: 0,
             filter: 'hue-rotate(0deg)',
-            transition: {
-              duration: duration * 0.8,
-              delay,
-              ease: 'easeOut',
-            },
           },
         }
-      
+
       default: // fade
         return {
           hidden: {
@@ -105,11 +85,6 @@ export default function MotionWrapper({
           visible: {
             opacity: 1,
             y: 0,
-            transition: {
-              duration,
-              delay,
-              ease: [0.25, 0.46, 0.45, 0.94],
-            },
           },
         }
     }
@@ -121,6 +96,11 @@ export default function MotionWrapper({
       initial="hidden"
       animate="visible"
       variants={getVariants()}
+      transition={{
+        duration,
+        delay,
+        ease: "easeOut"
+      }}
     >
       {children}
     </motion.div>
@@ -143,7 +123,7 @@ export function PageTransition({ children, className = '' }: PageTransitionProps
         exit={{ opacity: 0, y: -20 }}
         transition={{
           duration: 0.5,
-          ease: [0.25, 0.46, 0.45, 0.94],
+          ease: "easeOut",
         }}
       >
         {children}
@@ -159,10 +139,10 @@ interface ScrollAnimationProps {
   threshold?: number
 }
 
-export function ScrollAnimation({ 
-  children, 
+export function ScrollAnimation({
+  children,
   className = '',
-  threshold = 0.1 
+  threshold = 0.1
 }: ScrollAnimationProps) {
   return (
     <motion.div
@@ -172,7 +152,7 @@ export function ScrollAnimation({
       viewport={{ once: true, amount: threshold }}
       transition={{
         duration: 0.6,
-        ease: [0.25, 0.46, 0.45, 0.94],
+        ease: "easeOut",
       }}
     >
       {children}
@@ -188,8 +168,8 @@ interface HoverAnimationProps {
   glow?: boolean
 }
 
-export function HoverAnimation({ 
-  children, 
+export function HoverAnimation({
+  children,
   className = '',
   scale = 1.05,
   glow = false
@@ -197,7 +177,7 @@ export function HoverAnimation({
   return (
     <motion.div
       className={className}
-      whileHover={{ 
+      whileHover={{
         scale,
         boxShadow: glow ? '0 0 30px rgba(0, 255, 255, 0.5)' : undefined,
       }}
@@ -220,11 +200,11 @@ interface TypewriterProps {
   speed?: number
 }
 
-export function Typewriter({ 
-  text, 
+export function Typewriter({
+  text,
   className = '',
   delay = 0,
-  speed = 0.05 
+  speed = 0.05
 }: TypewriterProps) {
   return (
     <motion.div

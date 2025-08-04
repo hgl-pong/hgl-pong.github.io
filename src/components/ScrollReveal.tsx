@@ -53,7 +53,7 @@ export default function ScrollReveal({
       transition={{
         duration,
         delay,
-        ease: [0.25, 0.46, 0.45, 0.94]
+        ease: "easeOut"
       }}
     >
       {children}
@@ -68,10 +68,10 @@ interface StaggerContainerProps {
   className?: string
 }
 
-export function StaggerContainer({ 
-  children, 
-  staggerDelay = 0.1, 
-  className = '' 
+export function StaggerContainer({
+  children,
+  staggerDelay = 0.1,
+  className = ''
 }: StaggerContainerProps) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, amount: 0.1 })
@@ -108,12 +108,12 @@ export function StaggerItem({ children, className = '' }: StaggerItemProps) {
       className={className}
       variants={{
         hidden: { opacity: 0, y: 20 },
-        visible: { 
-          opacity: 1, 
+        visible: {
+          opacity: 1,
           y: 0,
           transition: {
             duration: 0.5,
-            ease: [0.25, 0.46, 0.45, 0.94]
+            ease: "easeOut"
           }
         }
       }}
