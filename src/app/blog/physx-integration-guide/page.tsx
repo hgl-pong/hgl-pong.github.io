@@ -1,5 +1,6 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import CodeBlock from '@/components/CodeBlock'
 import { Calendar, Clock, Tag, ArrowLeft, User } from 'lucide-react'
 import Link from 'next/link'
 
@@ -83,7 +84,8 @@ export default function PhysXIntegrationGuidePage() {
                   <li>配置Visual Studio项目设置</li>
                 </ol>
 
-                <pre><code>{`// 项目配置示例
+                <CodeBlock
+                  code={`// 项目配置示例
 // 包含目录
 $(PhysXSDK)/Include
 $(PhysXSDK)/Include/common
@@ -97,12 +99,16 @@ $(PhysXSDK)/Lib/$(Platform)/$(Configuration)
 PhysX_64.lib
 PhysXCommon_64.lib
 PhysXFoundation_64.lib
-PhysXExtensions_64.lib`}</code></pre>
+PhysXExtensions_64.lib`}
+                  language="cpp"
+                  title="PhysX项目配置"
+                />
 
                 <h3>PhysX初始化</h3>
                 <p>创建PhysX的基础组件：</p>
 
-                <pre><code>{`#include <PxPhysicsAPI.h>
+                <CodeBlock
+                  code={`#include <PxPhysicsAPI.h>
 
 class PhysicsEngine {
 private:
@@ -117,14 +123,14 @@ private:
 public:
     bool Initialize() {
         // 创建Foundation
-        m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, 
+        m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION,
                                         m_allocator, m_errorCallback);
         if (!m_foundation) {
             return false;
         }
 
         // 创建Physics对象
-        m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation, 
+        m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation,
                                    physx::PxTolerancesScale(), true);
         if (!m_physics) {
             return false;
@@ -133,7 +139,7 @@ public:
         // 创建场景描述
         physx::PxSceneDesc sceneDesc(m_physics->getTolerancesScale());
         sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
-        
+
         m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
         sceneDesc.cpuDispatcher = m_dispatcher;
         sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
@@ -168,7 +174,11 @@ public:
             m_foundation = nullptr;
         }
     }
-};`}</code></pre>
+};`}
+                  language="cpp"
+                  title="PhysX引擎初始化"
+                  showLineNumbers={true}
+                />
 
                 <h3>创建刚体</h3>
                 <p>PhysX中的刚体分为静态刚体和动态刚体：</p>

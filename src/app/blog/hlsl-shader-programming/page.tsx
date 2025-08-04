@@ -1,5 +1,6 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import CodeBlock from '@/components/CodeBlock'
 import { Calendar, Clock, Tag, ArrowLeft, User } from 'lucide-react'
 import Link from 'next/link'
 

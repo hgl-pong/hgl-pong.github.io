@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import MouseFollower from '@/components/MouseFollower'
 
 export const metadata: Metadata = {
   title: 'HGL博客 - DirectX与PhysX游戏引擎开发',
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body>
+        <MouseFollower />
         <div className="min-h-screen bg-gray-50">
           {children}
         </div>

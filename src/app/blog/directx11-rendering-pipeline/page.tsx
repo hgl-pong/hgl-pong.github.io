@@ -3,6 +3,9 @@ import Footer from '@/components/Footer'
 import ReadingProgress from '@/components/ReadingProgress'
 import BackToTop from '@/components/BackToTop'
 import TableOfContents from '@/components/TableOfContents'
+import CodeBlock from '@/components/CodeBlock'
+import ParticleBackground from '@/components/ParticleBackground'
+import ScrollReveal from '@/components/ScrollReveal'
 import { Calendar, Clock, Tag, ArrowLeft, User } from 'lucide-react'
 import Link from 'next/link'
 
@@ -18,63 +21,72 @@ export default function DirectX11RenderingPipelinePage() {
   ]
 
   return (
-    <>
+    <div className="min-h-screen bg-black">
+      <ParticleBackground theme="neon" />
       <ReadingProgress />
       <Header />
-      <main className="min-h-screen bg-gray-50">
+      <main className="relative z-10">
         {/* Article Header */}
-        <section className="bg-white border-b border-gray-200 py-12">
+        <section className="py-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Back Button */}
-            <div className="mb-8">
-              <Link href="/blog" className="inline-flex items-center text-primary-600 hover:text-primary-700 transition-colors">
-                <ArrowLeft size={20} className="mr-2" />
+            <ScrollReveal className="mb-8">
+              <Link href="/blog" className="inline-flex items-center text-gray-300 hover:text-white transition-colors group">
+                <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
                 返回博客列表
               </Link>
-            </div>
+            </ScrollReveal>
 
             {/* Category */}
-            <div className="mb-4">
-              <span className="inline-block bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium">
+            <ScrollReveal className="mb-6" delay={0.1}>
+              <span className="inline-flex items-center px-4 py-2 bg-white/10 border border-white/20 rounded-full text-gray-200 font-medium text-sm">
+                <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
                 DirectX
               </span>
-            </div>
+            </ScrollReveal>
 
             {/* Title */}
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">
-              DirectX 11渲染管线深度解析
-            </h1>
+            <ScrollReveal className="mb-8" delay={0.2}>
+              <h1 className="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-white via-gray-200 to-gray-300 bg-clip-text text-transparent">
+                DirectX 11渲染管线深度解析
+              </h1>
+              <div className="w-24 h-1 bg-gradient-to-r from-white to-gray-400 rounded-full"></div>
+            </ScrollReveal>
 
             {/* Meta Info */}
-            <div className="flex items-center space-x-6 text-gray-500 mb-8">
+            <ScrollReveal className="flex items-center space-x-8 text-gray-400 mb-8" delay={0.3}>
               <div className="flex items-center space-x-2">
-                <User size={18} />
-                <span>HGL</span>
+                <div className="p-1 bg-white/10 rounded-full">
+                  <User size={14} />
+                </div>
+                <span className="font-medium">HGL</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Calendar size={18} />
-                <span>2024年1月15日</span>
+                <div className="p-1 bg-white/10 rounded-full">
+                  <Calendar size={14} />
+                </div>
+                <span className="font-medium">2024年1月15日</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Clock size={18} />
-                <span>10分钟阅读</span>
+                <div className="p-1 bg-white/10 rounded-full">
+                  <Clock size={14} />
+                </div>
+                <span className="font-medium">10分钟阅读</span>
               </div>
-            </div>
+            </ScrollReveal>
 
             {/* Tags */}
-            <div className="flex items-center space-x-2">
-              <Tag size={18} className="text-gray-400" />
-              <div className="flex space-x-2">
-                {['DirectX 11', '渲染管线', 'HLSL'].map((tag) => (
-                  <span
-                    key={tag}
-                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
+            <ScrollReveal className="flex flex-wrap gap-3 mb-12" delay={0.4}>
+              {['DirectX 11', '渲染管线', 'HLSL'].map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center px-3 py-2 bg-white/10 text-gray-300 text-sm font-medium rounded-full border border-white/20"
+                >
+                  <Tag size={12} className="mr-1" />
+                  {tag}
+                </span>
+              ))}
+            </ScrollReveal>
           </div>
         </section>
 
@@ -84,8 +96,8 @@ export default function DirectX11RenderingPipelinePage() {
             <div className="flex gap-8">
               {/* Main Content */}
               <div className="flex-1 max-w-4xl">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                  <div className="prose max-w-none">
+                <ScrollReveal className="card p-8">
+                  <div className="prose prose-invert max-w-none">
                     <h2 id="overview">DirectX 11渲染管线概述</h2>
                     <p>
                       DirectX 11的渲染管线是现代图形编程的核心，它定义了从3D几何数据到最终像素输出的完整流程。
@@ -106,8 +118,9 @@ export default function DirectX11RenderingPipelinePage() {
 
                     <h3 id="input-assembler">输入装配器阶段</h3>
                     <p>输入装配器负责从内存中读取顶点数据，并将其组装成图元（点、线、三角形）。</p>
-                    
-                    <pre><code>{`// 创建顶点缓冲区
+
+                    <CodeBlock
+                      code={`// 创建顶点缓冲区
 struct Vertex {
     DirectX::XMFLOAT3 position;
     DirectX::XMFLOAT3 normal;
@@ -133,12 +146,17 @@ initData.pSysMem = vertices;
 
 // 创建顶点缓冲区
 ID3D11Buffer* vertexBuffer;
-device->CreateBuffer(&bufferDesc, &initData, &vertexBuffer);`}</code></pre>
+device->CreateBuffer(&bufferDesc, &initData, &vertexBuffer);`}
+                      language="cpp"
+                      title="创建顶点缓冲区"
+                      showLineNumbers={true}
+                    />
 
                     <h3 id="vertex-shader">顶点着色器阶段</h3>
                     <p>顶点着色器对每个顶点执行变换操作，通常包括模型-视图-投影变换。</p>
 
-                    <pre><code>{`// HLSL顶点着色器示例
+                    <CodeBlock
+                      code={`// HLSL顶点着色器示例
 cbuffer ConstantBuffer : register(b0) {
     matrix World;
     matrix View;
@@ -160,30 +178,35 @@ struct VS_OUTPUT {
 
 VS_OUTPUT VS(VS_INPUT input) {
     VS_OUTPUT output;
-    
+
     // 世界变换
     float4 worldPos = mul(float4(input.Position, 1.0f), World);
     output.WorldPos = worldPos.xyz;
-    
+
     // 视图变换
     float4 viewPos = mul(worldPos, View);
-    
+
     // 投影变换
     output.Position = mul(viewPos, Projection);
-    
+
     // 变换法线
     output.Normal = mul(input.Normal, (float3x3)World);
-    
+
     // 传递纹理坐标
     output.TexCoord = input.TexCoord;
-    
+
     return output;
-}`}</code></pre>
+}`}
+                      language="glsl"
+                      title="HLSL顶点着色器"
+                      showLineNumbers={true}
+                    />
 
                     <h3 id="pixel-shader">像素着色器阶段</h3>
                     <p>像素着色器计算每个像素的最终颜色，通常包括光照计算和纹理采样。</p>
 
-                    <pre><code>{`// HLSL像素着色器示例
+                    <CodeBlock
+                      code={`// HLSL像素着色器示例
 Texture2D DiffuseTexture : register(t0);
 SamplerState Sampler : register(s0);
 
@@ -203,19 +226,23 @@ struct PS_INPUT {
 float4 PS(PS_INPUT input) : SV_TARGET {
     // 采样漫反射纹理
     float4 textureColor = DiffuseTexture.Sample(Sampler, input.TexCoord);
-    
+
     // 标准化法线
     float3 normal = normalize(input.Normal);
-    
+
     // 计算漫反射光照
     float NdotL = max(0.0f, dot(normal, -LightDirection));
     float3 diffuse = LightColor * NdotL;
-    
+
     // 组合环境光和漫反射光
     float3 finalColor = (AmbientColor + diffuse) * textureColor.rgb;
-    
+
     return float4(finalColor, textureColor.a);
-}`}</code></pre>
+}`}
+                      language="glsl"
+                      title="HLSL像素着色器"
+                      showLineNumbers={true}
+                    />
 
                     <h3 id="optimization">性能优化技巧</h3>
                     <p>在DirectX 11渲染管线中，有几个关键的性能优化点：</p>
@@ -241,35 +268,39 @@ float4 PS(PS_INPUT input) : SV_TARGET {
                   </div>
                 </div>
               </div>
-              
+
               {/* Sidebar with Table of Contents */}
               <div className="hidden lg:block w-80">
-                <TableOfContents headings={headings} />
+                <ScrollReveal delay={0.6}>
+                  <TableOfContents headings={headings} />
+                </ScrollReveal>
               </div>
             </div>
           </div>
         </section>
 
         {/* Navigation */}
-        <section className="py-8 bg-white border-t border-gray-200">
+        <section className="py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center">
-              <div>
-                <Link href="/blog/physx-integration-guide" className="text-primary-600 hover:text-primary-700 transition-colors">
-                  ← 上一篇：PhysX物理引擎集成实战
-                </Link>
+            <ScrollReveal className="card p-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <Link href="/blog/physx-integration-guide" className="text-gray-300 hover:text-white transition-colors group">
+                    <span className="group-hover:-translate-x-1 transition-transform inline-block">←</span> 上一篇：PhysX物理引擎集成实战
+                  </Link>
+                </div>
+                <div>
+                  <Link href="/blog/hlsl-shader-programming" className="text-gray-300 hover:text-white transition-colors group">
+                    下一篇：HLSL着色器编程技巧 <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
+                  </Link>
+                </div>
               </div>
-              <div>
-                <Link href="/blog/hlsl-shader-programming" className="text-primary-600 hover:text-primary-700 transition-colors">
-                  下一篇：HLSL着色器编程技巧 →
-                </Link>
-              </div>
-            </div>
+            </ScrollReveal>
           </div>
         </section>
       </main>
       <Footer />
       <BackToTop />
-    </>
+    </div >
   )
 }
