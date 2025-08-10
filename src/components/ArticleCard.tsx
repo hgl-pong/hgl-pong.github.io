@@ -22,26 +22,26 @@ interface ArticleCardProps {
 const ArticleCard = ({ article, variant = 'default' }: ArticleCardProps) => {
   const getCategoryColor = (category: string) => {
     const colors: { [key: string]: string } = {
-      'DirectX': 'bg-blue-100 text-blue-700',
-      'PhysX': 'bg-green-100 text-green-700',
-      'HLSL': 'bg-yellow-100 text-yellow-700',
-      'C++': 'bg-purple-100 text-purple-700',
-      '引擎架构': 'bg-red-100 text-red-700',
-      '性能优化': 'bg-orange-100 text-orange-700'
+      'DirectX': 'bg-white/10 text-gray-200 border border-white/20',
+      'PhysX': 'bg-white/10 text-gray-200 border border-white/20',
+      'HLSL': 'bg-white/10 text-gray-200 border border-white/20',
+      'C++': 'bg-white/10 text-gray-200 border border-white/20',
+      '引擎架构': 'bg-white/10 text-gray-200 border border-white/20',
+      '性能优化': 'bg-white/10 text-gray-200 border border-white/20'
     }
-    return colors[category] || 'bg-gray-100 text-gray-700'
+    return colors[category] || 'bg-white/10 text-gray-200 border border-white/20'
   }
 
   if (variant === 'compact') {
     return (
       <Link href={`/blog/${article.slug}`}>
-        <div className="block p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0">
+        <div className="block p-4 hover:bg-white/5 transition-colors border-b border-white/10 last:border-b-0">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className="font-medium text-gray-900 mb-1 hover:text-primary-600 transition-colors">
+              <h3 className="font-medium text-white mb-1 hover:text-gray-300 transition-colors">
                 {article.title}
               </h3>
-              <div className="flex items-center space-x-4 text-sm text-gray-500">
+              <div className="flex items-center space-x-4 text-sm text-gray-400">
                 <span className="flex items-center space-x-1">
                   <Calendar size={14} />
                   <span>{article.date}</span>
@@ -64,23 +64,23 @@ const ArticleCard = ({ article, variant = 'default' }: ArticleCardProps) => {
   if (variant === 'featured') {
     return (
       <Link href={`/blog/${article.slug}`}>
-        <article className="bg-gradient-to-r from-primary-50 to-blue-50 rounded-lg p-8 hover:shadow-lg transition-all duration-300 border border-primary-100">
+        <article className="bg-gradient-to-r from-white/5 to-white/10 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/10 glass-highlight glass-noise">
           <div className="mb-4">
             <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(article.category)}`}>
               {article.category}
             </span>
           </div>
           
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 hover:text-primary-600 transition-colors">
+          <h2 className="text-2xl font-bold text-white mb-4 hover:text-gray-300 transition-colors">
             {article.title}
           </h2>
           
-          <p className="text-gray-600 mb-6 leading-relaxed">
+          <p className="text-gray-300 mb-6 leading-relaxed">
             {article.excerpt}
           </p>
           
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
+            <div className="flex items-center space-x-4 text-sm text-gray-400">
               {article.author && (
                 <div className="flex items-center space-x-1">
                   <User size={16} />
@@ -106,23 +106,23 @@ const ArticleCard = ({ article, variant = 'default' }: ArticleCardProps) => {
 
   return (
     <Link href={`/blog/${article.slug}`}>
-      <article className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <article className="bg-black/40 light:bg-white/70 rounded-3xl shadow-lg border border-white/10 light:border-black/10 p-6 hover:shadow-2xl transition-shadow glass-highlight glass-noise">
         <div className="mb-3">
           <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(article.category)}`}>
             {article.category}
           </span>
         </div>
 
-        <h2 className="text-xl font-bold text-gray-900 mb-3 hover:text-primary-600 transition-colors">
+        <h2 className="text-xl font-bold text-white mb-3 hover:text-gray-300 transition-colors">
           {article.title}
         </h2>
 
-        <p className="text-gray-600 mb-4 leading-relaxed">
+        <p className="text-gray-300 light:text-gray-800 mb-4 leading-relaxed">
           {article.excerpt}
         </p>
 
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
+          <div className="flex items-center space-x-4 text-sm text-gray-400">
             <div className="flex items-center space-x-1">
               <Calendar size={16} />
               <span>{article.date}</span>

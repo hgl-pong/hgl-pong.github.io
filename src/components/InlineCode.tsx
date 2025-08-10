@@ -7,8 +7,8 @@ const InlineCode = ({ children, className = '' }: InlineCodeProps) => {
   return (
     <code 
       className={`
-        bg-primary-50 text-primary-700 px-2 py-1 rounded font-medium
-        transition-colors duration-200 hover:bg-primary-100
+        bg-white/10 text-gray-200 px-2 py-1 rounded font-medium
+        transition-colors duration-200 hover:bg-white/20
         ${className}
       `}
       style={{ 

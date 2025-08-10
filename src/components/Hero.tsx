@@ -19,8 +19,8 @@ const Hero = () => {
       {/* Elegant Particle Background */}
       <ParticleBackground theme="neon" />
 
-      {/* Clean Dark Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+      {/* Background (dark default, light override) */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black light:from-white light:via-gray-100 light:to-white"></div>
 
       {/* Subtle Animated Elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -126,7 +126,7 @@ const Hero = () => {
                   ease: "easeInOut"
                 }}
               >
-                <Sparkles size={12} className="text-black" />
+                <Sparkles size={12} className="text-gray-900" />
               </motion.div>
               <motion.div
                 className="absolute -bottom-2 -left-3 w-4 h-4 bg-gray-300 rounded-full flex items-center justify-center shadow-lg opacity-60"
@@ -154,7 +154,7 @@ const Hero = () => {
           >
             <Typewriter
               text="HGL"
-              className="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-300 bg-clip-text text-transparent leading-tight"
+              className="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-300 light:from-gray-900 light:via-gray-700 light:to-gray-800 bg-clip-text text-transparent leading-tight"
               delay={0.5}
               speed={0.2}
             />
@@ -164,11 +164,11 @@ const Hero = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 1.2 }}
             >
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-200 mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-200 light:text-gray-900 mb-4">
                 游戏引擎开发工程师
               </h2>
               <motion.div
-                className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 h-1 bg-gradient-to-r from-white to-gray-400 rounded-full"
+                className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 h-1 bg-gradient-to-r from-white to-gray-400 light:from-gray-800 light:to-gray-600 rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: 96 }}
                 transition={{ duration: 1, delay: 1.5 }}
@@ -186,7 +186,7 @@ const Hero = () => {
             {['DirectX 11', 'PhysX物理引擎', 'HLSL着色器'].map((tag, index) => (
               <motion.span
                 key={tag}
-                className="px-4 py-2 bg-white/10 border border-white/20 rounded-full text-gray-200 font-medium text-sm backdrop-blur-sm"
+                className="px-4 py-2 bg-white/10 border border-white/20 rounded-full text-gray-200 light:text-gray-800 font-medium text-sm backdrop-blur-sm"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{
@@ -207,7 +207,7 @@ const Hero = () => {
 
           {/* Clean Description */}
           <motion.p
-            className="text-lg text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed"
+            className="text-lg text-gray-300 light:text-gray-800 mb-10 max-w-3xl mx-auto leading-relaxed text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 2.4 }}
@@ -217,21 +217,21 @@ const Hero = () => {
           </motion.p>
 
           {/* Contact Info */}
-          <div className={`flex justify-center items-center space-x-8 text-gray-500 mb-12 ${isVisible ? 'animate-fade-in-up animate-delay-500' : 'opacity-0'}`}>
-            <div className="group flex items-center space-x-2 hover:text-white transition-all duration-300 cursor-pointer">
-              <div className="p-2 bg-gray-800 rounded-full group-hover:bg-gray-700 transition-colors duration-300">
+          <div className={`flex justify-center items-center space-x-8 text-gray-500 light:text-gray-700 mb-12 ${isVisible ? 'animate-fade-in-up animate-delay-500' : 'opacity-0'}`}>
+            <div className="group flex items-center space-x-2 hover:text-white light:hover:text-gray-900 transition-all duration-300 cursor-pointer">
+              <div className="p-2 bg-gray-800 light:bg-gray-200 rounded-full group-hover:bg-gray-700 light:group-hover:bg-gray-300 transition-colors duration-300">
                 <MapPin size={18} />
               </div>
               <span className="font-medium">中国</span>
             </div>
-            <div className="group flex items-center space-x-2 hover:text-white transition-all duration-300 cursor-pointer">
-              <div className="p-2 bg-gray-800 rounded-full group-hover:bg-gray-700 transition-colors duration-300">
+            <div className="group flex items-center space-x-2 hover:text-white light:hover:text-gray-900 transition-all duration-300 cursor-pointer">
+              <div className="p-2 bg-gray-800 light:bg-gray-200 rounded-full group-hover:bg-gray-700 light:group-hover:bg-gray-300 transition-colors duration-300">
                 <Mail size={18} />
               </div>
               <span className="font-medium">联系邮箱</span>
             </div>
-            <div className="group flex items-center space-x-2 hover:text-white transition-all duration-300 cursor-pointer">
-              <div className="p-2 bg-gray-800 rounded-full group-hover:bg-gray-700 transition-colors duration-300">
+            <div className="group flex items-center space-x-2 hover:text-white light:hover:text-gray-900 transition-all duration-300 cursor-pointer">
+              <div className="p-2 bg-gray-800 light:bg-gray-200 rounded-full group-hover:bg-gray-700 light:group-hover:bg-gray-300 transition-colors duration-300">
                 <Github size={18} />
               </div>
               <span className="font-medium">GitHub</span>
@@ -262,10 +262,10 @@ const Hero = () => {
 
           {/* Scroll Indicator */}
           <div className={`mt-16 ${isVisible ? 'animate-fade-in-up animate-delay-700' : 'opacity-0'}`}>
-            <div className="flex flex-col items-center text-gray-400">
+            <div className="flex flex-col items-center text-gray-400 light:text-gray-600">
               <span className="text-sm font-medium mb-2">向下滚动探索更多</span>
-              <div className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center">
-                <div className="w-1 h-3 bg-gray-400 rounded-full mt-2 animate-bounce"></div>
+              <div className="w-6 h-10 border-2 border-white/30 light:border-black/20 rounded-full flex justify-center">
+                <div className="w-1 h-3 bg-white/60 light:bg-black/40 rounded-full mt-2 animate-bounce"></div>
               </div>
             </div>
           </div>

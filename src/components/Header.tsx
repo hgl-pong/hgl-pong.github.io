@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
+// import ThemeToggle from './ThemeToggle'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -24,13 +25,19 @@ const Header = () => {
     { name: '联系', href: '/contact' },
   ]
 
+  // Theme toggle removed per request
+
+  useEffect(() => {
+    // Respect existing class; no toggle button
+  }, [])
+
   return (
     <header
       className={`
         sticky top-0 z-50 transition-all duration-500 ease-out
         ${isScrolled
-          ? 'bg-black/90 backdrop-blur-xl shadow-xl border-b border-white/10'
-          : 'bg-black/80 backdrop-blur-sm shadow-sm border-b border-gray-800'
+          ? 'bg-black/90 backdrop-blur-xl shadow-xl border-b border-white/10 light:bg-white/90'
+          : 'bg-black/80 backdrop-blur-sm shadow-sm border-b border-gray-800 light:bg-white/80'
         }
       `}
     >
@@ -52,7 +59,7 @@ const Header = () => {
 
               {/* Clean Logo Text */}
               <div className="hidden sm:block">
-                <span className="text-2xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-300 bg-clip-text text-transparent group-hover:from-gray-100 group-hover:to-white transition-all duration-300">
+                <span className="text-2xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-300 light:from-gray-900 light:via-gray-700 light:to-gray-800 bg-clip-text text-transparent group-hover:from-gray-100 group-hover:to-white light:group-hover:from-gray-800 light:group-hover:to-gray-900 transition-all duration-300">
                   HGL博客
                 </span>
               </div>
@@ -74,15 +81,16 @@ const Header = () => {
                 <span className="relative z-10">{item.name}</span>
 
                 {/* Clean hover background */}
-                <div className="absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                 {/* Simple active indicator */}
                 <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white rounded-full group-hover:w-8 transition-all duration-300"></div>
 
                 {/* Subtle glow effect */}
-                <div className="absolute inset-0 bg-white/5 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-white/10 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
             ))}
+            {/* Theme toggle removed */}
           </nav>
 
           {/* Mobile menu button */}

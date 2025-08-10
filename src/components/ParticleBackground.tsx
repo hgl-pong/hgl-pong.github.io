@@ -170,7 +170,7 @@ export default function ParticleBackground({
   }
 
   return (
-    <div className={`fixed inset-0 pointer-events-none z-0 ${className}`}>
+    <div className={`fixed inset-0 pointer-events-none z-0 opacity-60 light:opacity-20 ${className}`}>
       <Particles
         id={`particles-${theme}`}
         init={particlesInit}

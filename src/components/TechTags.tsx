@@ -16,19 +16,19 @@ const TechTags = ({
     
     switch (variant) {
       case 'clickable':
-        return `cursor-pointer transition-colors ${
+        return `cursor-pointer transition-all ${
           isSelected 
-            ? 'bg-primary-600 text-white' 
-            : 'bg-gray-100 text-gray-700 hover:bg-primary-100 hover:text-primary-700'
+            ? 'bg-white/20 text-white shadow-md' 
+            : 'bg-white/10 text-gray-200 hover:bg-white/20 hover:text-white'
         }`
       case 'filter':
         return `cursor-pointer transition-all ${
           isSelected 
-            ? 'bg-primary-600 text-white shadow-md' 
-            : 'bg-white text-gray-700 border border-gray-300 hover:border-primary-300 hover:text-primary-600'
+            ? 'bg-white/20 text-white shadow-md' 
+            : 'bg-black/30 text-gray-200 border border-white/20 hover:border-white/30 hover:text-white'
         }`
       default:
-        return 'bg-gray-100 text-gray-700'
+        return 'bg-white/10 text-gray-200'
     }
   }
 

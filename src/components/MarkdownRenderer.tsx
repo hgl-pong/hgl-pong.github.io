@@ -52,11 +52,11 @@ const MarkdownRenderer = ({ content, className = '' }: MarkdownRendererProps) =>
           <HeadingTag
             key={elements.length}
             className={`
-              font-bold text-gray-900 mb-4 mt-8
-              ${level === 1 ? 'text-3xl' : ''}
-              ${level === 2 ? 'text-2xl' : ''}
-              ${level === 3 ? 'text-xl' : ''}
-              ${level >= 4 ? 'text-lg' : ''}
+              font-bold mb-4 mt-8
+              ${level === 1 ? 'text-3xl text-white' : ''}
+              ${level === 2 ? 'text-2xl text-white' : ''}
+              ${level === 3 ? 'text-xl text-gray-100' : ''}
+              ${level >= 4 ? 'text-lg text-gray-200' : ''}
             `}
           >
             {parseInlineElements(text)}
@@ -66,7 +66,7 @@ const MarkdownRenderer = ({ content, className = '' }: MarkdownRendererProps) =>
       // 段落处理
       else if (line.trim()) {
         elements.push(
-          <p key={elements.length} className="mb-4 leading-7 text-gray-700">
+          <p key={elements.length} className="mb-4 leading-7 text-gray-300">
             {parseInlineElements(line)}
           </p>
         )

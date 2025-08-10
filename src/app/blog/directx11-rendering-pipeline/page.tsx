@@ -20,13 +20,13 @@ export default function DirectX11RenderingPipelinePage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen">
         {/* Article Header */}
-        <section className="bg-white border-b border-gray-200 py-12">
+        <section className="bg-black/40 border-b border-white/10 py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Back Button */}
             <div className="mb-8">
-              <Link href="/blog" className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors group">
+              <Link href="/blog" className="inline-flex items-center text-gray-200 hover:text-white transition-colors group">
                 <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
                 返回博客列表
               </Link>
@@ -34,36 +34,36 @@ export default function DirectX11RenderingPipelinePage() {
 
             {/* Category */}
             <div className="mb-6">
-              <span className="inline-flex items-center px-4 py-2 bg-gray-100 border border-gray-200 rounded-full text-gray-700 font-medium text-sm">
-                <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
+              <span className="inline-flex items-center px-4 py-2 bg-white/10 border border-white/20 rounded-full text-gray-200 font-medium text-sm">
+                <div className="w-2 h-2 bg-white/70 border border-white/30 rounded-full mr-2"></div>
                 DirectX
               </span>
             </div>
 
             {/* Title */}
             <div className="mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              <h1 className="text-4xl font-bold text-white mb-4">
                 DirectX 11渲染管线深度解析
               </h1>
-              <div className="w-24 h-1 bg-gray-900 rounded-full"></div>
+              <div className="w-24 h-1 bg-white rounded-full"></div>
             </div>
 
             {/* Meta Info */}
-            <div className="flex items-center space-x-8 text-gray-500 mb-8">
+            <div className="flex items-center space-x-8 text-gray-400 mb-8">
               <div className="flex items-center space-x-2">
-                <div className="p-1 bg-gray-100 rounded-full">
+                <div className="p-1 bg-white/10 rounded-full">
                   <User size={14} />
                 </div>
                 <span className="font-medium">HGL</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="p-1 bg-gray-100 rounded-full">
+                <div className="p-1 bg-white/10 rounded-full">
                   <Calendar size={14} />
                 </div>
                 <span className="font-medium">2024年1月15日</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="p-1 bg-gray-100 rounded-full">
+                <div className="p-1 bg-white/10 rounded-full">
                   <Clock size={14} />
                 </div>
                 <span className="font-medium">10分钟阅读</span>
@@ -75,7 +75,7 @@ export default function DirectX11RenderingPipelinePage() {
               {['DirectX 11', '渲染管线', 'HLSL'].map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center px-3 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-full border border-gray-200"
+                  className="inline-flex items-center px-3 py-2 bg-white/10 text-gray-200 text-sm font-medium rounded-full border border-white/20"
                 >
                   <Tag size={12} className="mr-1" />
                   {tag}
@@ -91,8 +91,8 @@ export default function DirectX11RenderingPipelinePage() {
             <div className="flex gap-8">
               {/* Main Content */}
               <div className="flex-1 max-w-4xl">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                  <div className="prose prose-gray max-w-none">
+                <div className="bg-black/40 rounded-3xl shadow-lg border border-white/10 p-8 glass-highlight glass-noise">
+                  <div className="prose max-w-none">
                     <h2 id="overview">DirectX 11渲染管线概述</h2>
                     <p>
                       DirectX 11的渲染管线是现代图形编程的核心，它定义了从3D几何数据到最终像素输出的完整流程。
@@ -257,15 +257,15 @@ float4 main(PixelInput input) : SV_TARGET
         {/* Navigation */}
         <section className="py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-black/40 rounded-3xl shadow-lg border border-white/10 p-6 glass-highlight glass-noise">
               <div className="flex justify-between items-center">
                 <div>
-                  <Link href="/blog/physx-integration-guide" className="text-gray-600 hover:text-gray-900 transition-colors group">
+                  <Link href="/blog/physx-integration-guide" className="text-gray-200 hover:text-white transition-colors group">
                     <span className="group-hover:-translate-x-1 transition-transform inline-block">←</span> 上一篇：PhysX物理引擎集成实战
                   </Link>
                 </div>
                 <div>
-                  <Link href="/blog/hlsl-shader-programming" className="text-gray-600 hover:text-gray-900 transition-colors group">
+                  <Link href="/blog/hlsl-shader-programming" className="text-gray-200 hover:text-white transition-colors group">
                     下一篇：HLSL着色器编程技巧 <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
                   </Link>
                 </div>

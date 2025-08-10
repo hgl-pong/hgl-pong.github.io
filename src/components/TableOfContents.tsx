@@ -51,7 +51,7 @@ const TableOfContents = ({ headings }: TableOfContentsProps) => {
       {/* Mobile Toggle */}
       <button
         onClick={() => setIsVisible(!isVisible)}
-        className="lg:hidden w-full flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg mb-4"
+        className="lg:hidden w-full flex items-center justify-between p-3 bg-black/50 border border-white/10 rounded-xl mb-4 text-gray-200"
       >
         <span className="flex items-center space-x-2">
           <List size={18} />
@@ -63,10 +63,10 @@ const TableOfContents = ({ headings }: TableOfContentsProps) => {
       </button>
 
       {/* Table of Contents */}
-      <div className={`bg-white border border-gray-200 rounded-lg p-4 ${
+      <div className={`bg-black/50 border border-white/10 rounded-xl p-4 ${
         isVisible ? 'block' : 'hidden lg:block'
       }`}>
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center space-x-2">
+        <h3 className="font-semibold text-white mb-3 flex items-center space-x-2">
           <List size={18} />
           <span>文章目录</span>
         </h3>
@@ -77,10 +77,10 @@ const TableOfContents = ({ headings }: TableOfContentsProps) => {
               <li key={id}>
                 <button
                   onClick={() => scrollToHeading(id)}
-                  className={`block w-full text-left py-1 px-2 text-sm transition-colors rounded ${
+                className={`block w-full text-left py-1 px-2 text-sm transition-colors rounded ${
                     activeId === id
-                      ? 'text-primary-600 bg-primary-50 font-medium'
-                      : 'text-gray-600 hover:text-primary-600 hover:bg-gray-50'
+                      ? 'text-white bg-white/10 font-medium'
+                      : 'text-gray-300 hover:text-white hover:bg-white/5'
                   }`}
                   style={{ paddingLeft: `${(level - 1) * 12 + 8}px` }}
                 >

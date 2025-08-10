@@ -8,13 +8,13 @@ export default function PhysXIntegrationGuidePage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen">
         {/* Article Header */}
-        <section className="bg-white border-b border-gray-200 py-12">
+        <section className="bg-black/40 border-b border-white/10 py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Back Button */}
             <div className="mb-8">
-              <Link href="/blog" className="inline-flex items-center text-primary-600 hover:text-primary-700 transition-colors">
+              <Link href="/blog" className="inline-flex items-center text-gray-200 hover:text-white transition-colors">
                 <ArrowLeft size={20} className="mr-2" />
                 返回博客列表
               </Link>
@@ -22,18 +22,18 @@ export default function PhysXIntegrationGuidePage() {
 
             {/* Category */}
             <div className="mb-4">
-              <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+              <span className="inline-block bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm font-medium">
                 PhysX
               </span>
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl font-bold text-white mb-6">
               PhysX物理引擎集成实战
             </h1>
 
             {/* Meta Info */}
-            <div className="flex items-center space-x-6 text-gray-500 mb-8">
+            <div className="flex items-center space-x-6 text-gray-400 mb-8">
               <div className="flex items-center space-x-2">
                 <User size={18} />
                 <span>HGL</span>
@@ -55,7 +55,7 @@ export default function PhysXIntegrationGuidePage() {
                 {['PhysX', '物理引擎', '碰撞检测'].map((tag) => (
                   <span
                     key={tag}
-                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
+                    className="bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm"
                   >
                     {tag}
                   </span>
@@ -68,7 +68,7 @@ export default function PhysXIntegrationGuidePage() {
         {/* Article Content */}
         <section className="py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <div className="bg-black/40 rounded-3xl shadow-lg border border-white/10 p-8 glass-highlight glass-noise">
               <div className="prose max-w-none">
                 <h2>PhysX物理引擎简介</h2>
                 <p>
@@ -417,16 +417,16 @@ public:
         </section>
 
         {/* Navigation */}
-        <section className="py-8 bg-white border-t border-gray-200">
+        <section className="py-8 bg-black/40 border-t border-white/10">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center">
               <div>
-                <Link href="/blog/hlsl-shader-programming" className="text-primary-600 hover:text-primary-700 transition-colors">
+                <Link href="/blog/hlsl-shader-programming" className="text-gray-200 hover:text-white transition-colors">
                   ← 上一篇：HLSL着色器编程技巧
                 </Link>
               </div>
               <div>
-                <Link href="/blog/directx11-rendering-pipeline" className="text-primary-600 hover:text-primary-700 transition-colors">
+                <Link href="/blog/directx11-rendering-pipeline" className="text-gray-200 hover:text-white transition-colors">
                   下一篇：DirectX 11渲染管线深度解析 →
                 </Link>
               </div>

@@ -8,13 +8,13 @@ export default function HLSLShaderProgrammingPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen">
         {/* Article Header */}
-        <section className="bg-white border-b border-gray-200 py-12">
+        <section className="bg-black/40 border-b border-white/10 py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Back Button */}
             <div className="mb-8">
-              <Link href="/blog" className="inline-flex items-center text-primary-600 hover:text-primary-700 transition-colors">
+              <Link href="/blog" className="inline-flex items-center text-gray-200 hover:text-white transition-colors">
                 <ArrowLeft size={20} className="mr-2" />
                 返回博客列表
               </Link>
@@ -22,18 +22,18 @@ export default function HLSLShaderProgrammingPage() {
 
             {/* Category */}
             <div className="mb-4">
-              <span className="inline-block bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-medium">
+              <span className="inline-block bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm font-medium">
                 HLSL
               </span>
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl font-bold text-white mb-6">
               HLSL着色器编程技巧
             </h1>
 
             {/* Meta Info */}
-            <div className="flex items-center space-x-6 text-gray-500 mb-8">
+            <div className="flex items-center space-x-6 text-gray-400 mb-8">
               <div className="flex items-center space-x-2">
                 <User size={18} />
                 <span>HGL</span>
@@ -55,7 +55,7 @@ export default function HLSLShaderProgrammingPage() {
                 {['HLSL', '着色器', '光照'].map((tag) => (
                   <span
                     key={tag}
-                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
+                    className="bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm"
                   >
                     {tag}
                   </span>
@@ -68,7 +68,7 @@ export default function HLSLShaderProgrammingPage() {
         {/* Article Content */}
         <section className="py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <div className="bg-black/40 rounded-3xl shadow-lg border border-white/10 p-8 glass-highlight glass-noise">
               <div className="prose max-w-none">
                 <h2>HLSL着色器编程基础</h2>
                 <p>
@@ -79,7 +79,9 @@ export default function HLSLShaderProgrammingPage() {
                 <h3>基础光照模型</h3>
                 <p>让我们从经典的Phong光照模型开始：</p>
 
-                <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>{`// Phong光照模型
+                <CodeBlock
+                  language="hlsl"
+                  code={`// Phong光照模型
 struct LightData {
     float3 position;
     float3 color;
@@ -110,12 +112,15 @@ float3 CalculatePhongLighting(float3 worldPos, float3 normal, float3 viewDir,
     float3 specular = light.color * material.specular * spec * light.intensity;
     
     return ambient + diffuse + specular;
-}`}</code></pre>
+}`}
+                />
 
                 <h3>PBR材质系统</h3>
                 <p>现代游戏更多使用基于物理的渲染（PBR）：</p>
 
-                <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>{`// PBR材质结构
+                <CodeBlock
+                  language="hlsl"
+                  code={`// PBR材质结构
 struct PBRMaterial {
     float3 albedo;      // 基础颜色
     float metallic;     // 金属度
@@ -141,12 +146,15 @@ float DistributionGGX(float3 N, float3 H, float roughness) {
     denom = 3.14159265 * denom * denom;
     
     return num / denom;
-}`}</code></pre>
+}`}
+                />
 
                 <h3>阴影映射技术</h3>
                 <p>阴影是增强场景真实感的重要技术：</p>
 
-                <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>{`// 阴影映射顶点着色器
+                <CodeBlock
+                  language="hlsl"
+                  code={`// 阴影映射顶点着色器
 struct ShadowVS_INPUT {
     float3 Position : POSITION;
 };
@@ -170,7 +178,8 @@ ShadowVS_OUTPUT ShadowVS(ShadowVS_INPUT input) {
     output.LightSpacePos = output.Position;
     
     return output;
-}`}</code></pre>
+}`}
+                />
 
                 <h3>性能优化技巧</h3>
                 <p>在HLSL编程中，性能优化至关重要：</p>
@@ -199,16 +208,16 @@ ShadowVS_OUTPUT ShadowVS(ShadowVS_INPUT input) {
         </section>
 
         {/* Navigation */}
-        <section className="py-8 bg-white border-t border-gray-200">
+        <section className="py-8 bg-black/40 border-t border-white/10">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center">
               <div>
-                <Link href="/blog/directx11-rendering-pipeline" className="text-primary-600 hover:text-primary-700 transition-colors">
+                <Link href="/blog/directx11-rendering-pipeline" className="text-gray-200 hover:text-white transition-colors">
                   ← 上一篇：DirectX 11渲染管线深度解析
                 </Link>
               </div>
               <div>
-                <Link href="/blog/physx-integration-guide" className="text-primary-600 hover:text-primary-700 transition-colors">
+                <Link href="/blog/physx-integration-guide" className="text-gray-200 hover:text-white transition-colors">
                   下一篇：PhysX物理引擎集成实战 →
                 </Link>
               </div>

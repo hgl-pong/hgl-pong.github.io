@@ -39,12 +39,12 @@ const SearchBox = ({ onSearch, placeholder = "搜索文章..." }: SearchBoxProps
             onChange={(e) => handleSearch(e.target.value)}
             onFocus={() => setIsExpanded(true)}
             placeholder={placeholder}
-            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+            className="w-full pl-10 pr-10 py-2 border border-white/20 bg-black/30 text-gray-200 placeholder-gray-400 rounded-xl focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300"
           />
           {query && (
             <button
               onClick={clearSearch}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
             >
               <X size={16} />
             </button>
@@ -54,9 +54,9 @@ const SearchBox = ({ onSearch, placeholder = "搜索文章..." }: SearchBoxProps
       
       {/* 搜索建议 */}
       {query && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-black/80 border border-white/10 rounded-xl shadow-lg z-50 backdrop-blur-sm">
           <div className="p-2">
-            <div className="text-sm text-gray-500 mb-2">搜索建议</div>
+            <div className="text-sm text-gray-400 mb-2">搜索建议</div>
             <div className="space-y-1">
               {['DirectX 11', 'PhysX', 'HLSL', 'C++引擎'].filter(item => 
                 item.toLowerCase().includes(query.toLowerCase())
@@ -64,7 +64,7 @@ const SearchBox = ({ onSearch, placeholder = "搜索文章..." }: SearchBoxProps
                 <button
                   key={suggestion}
                   onClick={() => handleSearch(suggestion)}
-                  className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                  className="block w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-white/10 rounded"
                 >
                   {suggestion}
                 </button>

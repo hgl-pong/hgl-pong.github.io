@@ -60,7 +60,7 @@ const LatestPosts = () => {
   return (
     <section id="latest-posts" className="py-24 relative">
       {/* Background with subtle pattern */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-gray-50/50 to-white"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/0 light:from-black/0 light:via-black/0 light:to-black/0"></div>
       <div className="absolute inset-0 opacity-5" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
       }}></div>
@@ -73,10 +73,10 @@ const LatestPosts = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
             </svg>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-800 bg-clip-text text-transparent mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             最新文章
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
             分享最新的技术心得和项目经验，探索游戏引擎开发的前沿技术
           </p>
           <div className="mt-6 w-24 h-1 bg-gradient-to-r from-gray-700 to-gray-900 rounded-full mx-auto"></div>
@@ -88,7 +88,7 @@ const LatestPosts = () => {
             <article
               key={post.id}
               className={`
-                group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-white/20
+                group relative overflow-hidden bg-black/40 backdrop-blur-sm border border-white/10 glass-highlight glass-noise
                 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500
                 hover:transform hover:-translate-y-2 hover:scale-[1.02]
                 ${isVisible ? `animate-fade-in-up animate-delay-${(index + 1) * 200}` : 'opacity-0'}
@@ -98,41 +98,41 @@ const LatestPosts = () => {
                 <div className="relative z-10">
                   {/* Category Badge */}
                   <div className="mb-6">
-                    <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-500/10 to-white/10 border border-gray-200/50 rounded-full text-sm font-semibold text-gray-700 hover:from-gray-500/20 hover:to-white/20 transition-all duration-300 hover:scale-105">
-                      <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
+                    <span className="inline-flex items-center px-4 py-2 bg-white/10 border border-white/20 rounded-full text-sm font-semibold text-gray-200 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                      <div className="w-2 h-2 bg-white/70 border border-white/30 rounded-full mr-2"></div>
                       {post.category}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-gray-600 transition-all duration-300 leading-tight">
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-gray-300 transition-all duration-300 leading-tight">
                     {post.title}
-                    <div className="w-0 group-hover:w-full h-0.5 bg-gradient-to-r from-gray-700 to-gray-900 transition-all duration-500 mt-2"></div>
+                    <div className="w-0 group-hover:w-full h-0.5 bg-gradient-to-r from-white/50 to-white transition-all duration-500 mt-2"></div>
                   </h3>
 
                   {/* Excerpt */}
-                  <p className="text-gray-600 mb-6 line-clamp-3 group-hover:text-gray-700 transition-colors duration-300 leading-relaxed">
+                  <p className="text-gray-300 mb-6 line-clamp-3 group-hover:text-gray-200 transition-colors duration-300 leading-relaxed">
                     {post.excerpt}
                   </p>
 
                   {/* Meta Info */}
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-6 pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between text-sm text-gray-400 mb-6 pt-4 border-t border-white/10">
                     <div className="flex items-center space-x-6">
-                      <div className="flex items-center space-x-2 hover:text-gray-600 transition-colors duration-300">
-                        <div className="p-1 bg-gray-50 rounded-full">
+                      <div className="flex items-center space-x-2 hover:text-white transition-colors duration-300">
+                        <div className="p-1 bg-white/10 rounded-full">
                           <Calendar size={14} />
                         </div>
                         <span className="font-medium">{post.date}</span>
                       </div>
-                      <div className="flex items-center space-x-2 hover:text-gray-600 transition-colors duration-300">
-                        <div className="p-1 bg-gray-50 rounded-full">
+                      <div className="flex items-center space-x-2 hover:text-white transition-colors duration-300">
+                        <div className="p-1 bg-white/10 rounded-full">
                           <Clock size={14} />
                         </div>
                         <span className="font-medium">{post.readTime}</span>
                       </div>
                     </div>
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <ArrowRight size={18} className="text-gray-500 transform group-hover:translate-x-1 transition-transform duration-300" />
+                      <ArrowRight size={18} className="text-gray-300 transform group-hover:translate-x-1 transition-transform duration-300" />
                     </div>
                   </div>
 
@@ -141,14 +141,14 @@ const LatestPosts = () => {
                     {post.tags.slice(0, 3).map((tag, tagIndex) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full hover:bg-gray-200 hover:text-gray-700 transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                        className="inline-flex items-center px-3 py-1 bg-white/10 text-gray-200 text-xs font-medium rounded-full hover:bg-white/20 hover:text-white transition-all duration-300 transform hover:scale-105 cursor-pointer"
                       >
                         <Tag size={10} className="mr-1" />
                         {tag}
                       </span>
                     ))}
                     {post.tags.length > 3 && (
-                      <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 text-xs font-medium rounded-full">
+                      <span className="inline-flex items-center px-3 py-1 bg-white/10 text-gray-200 text-xs font-medium rounded-full">
                         +{post.tags.length - 3}
                       </span>
                     )}

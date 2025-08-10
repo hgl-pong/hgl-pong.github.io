@@ -25,22 +25,28 @@ module.exports = {
         DEFAULT: {
           css: {
             maxWidth: 'none',
-            color: '#374151',
+            color: '#e5e5e5',
+            a: {
+              color: '#f3f4f6',
+            },
+            strong: {
+              color: '#f3f4f6',
+            },
             h1: {
-              color: '#111827',
+              color: '#ffffff',
             },
             h2: {
-              color: '#111827',
+              color: '#ffffff',
             },
             h3: {
-              color: '#111827',
+              color: '#f3f4f6',
             },
             h4: {
-              color: '#111827',
+              color: '#e5e5e5',
             },
             code: {
-              color: '#111827',
-              backgroundColor: '#f3f4f6',
+              color: '#e5e5e5',
+              backgroundColor: '#111827',
               padding: '0.25rem 0.375rem',
               borderRadius: '0.25rem',
               fontWeight: '600',

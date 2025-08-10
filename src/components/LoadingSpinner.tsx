@@ -1,12 +1,12 @@
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
-  color?: 'primary' | 'white' | 'gray'
+  color?: 'white' | 'gray'
   className?: string
 }
 
 const LoadingSpinner = ({ 
   size = 'md', 
-  color = 'primary', 
+  color = 'white', 
   className = '' 
 }: LoadingSpinnerProps) => {
   const sizeClasses = {
@@ -16,7 +16,6 @@ const LoadingSpinner = ({
   }
 
   const colorClasses = {
-    primary: 'text-primary-600',
     white: 'text-white',
     gray: 'text-gray-600'
   }
