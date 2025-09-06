@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Copy, Check } from 'lucide-react'
+import { createHighlighter } from 'shiki'
 
 interface CodeBlockProps {
   code: string
@@ -12,80 +13,87 @@ interface CodeBlockProps {
 
 const CodeBlock = ({ code, language, title, showLineNumbers = false }: CodeBlockProps) => {
   const [copied, setCopied] = useState(false)
+  const [highlightedCode, setHighlightedCode] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Simple syntax highlighting function
-  const highlightCode = (code: string, lang: string): string => {
-    // Escape HTML first
-    let highlighted = code
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-
-    // Common keywords for different languages
-    const keywords: { [key: string]: string[] } = {
-      cpp: ['#include', 'class', 'public', 'private', 'protected', 'virtual', 'const', 'static', 'void', 'int', 'float', 'double', 'char', 'bool', 'if', 'else', 'for', 'while', 'return', 'new', 'delete', 'namespace', 'using', 'template', 'typename', 'struct'],
-      javascript: ['function', 'const', 'let', 'var', 'if', 'else', 'for', 'while', 'return', 'class', 'extends', 'import', 'export', 'default', 'async', 'await', 'try', 'catch', 'finally', 'this'],
-      typescript: ['function', 'const', 'let', 'var', 'if', 'else', 'for', 'while', 'return', 'class', 'extends', 'import', 'export', 'default', 'async', 'await', 'try', 'catch', 'finally', 'interface', 'type', 'enum', 'this'],
-      python: ['def', 'class', 'if', 'else', 'elif', 'for', 'while', 'return', 'import', 'from', 'as', 'try', 'except', 'finally', 'with', 'lambda', 'yield', 'self'],
-      glsl: ['attribute', 'uniform', 'varying', 'vec2', 'vec3', 'vec4', 'mat2', 'mat3', 'mat4', 'sampler2D', 'float', 'int', 'bool', 'void', 'if', 'else', 'for', 'while', 'return'],
-      hlsl: [
-        'cbuffer', 'StructuredBuffer', 'RWStructuredBuffer', 'Texture2D', 'Texture2DArray', 'Texture3D', 'RWTexture2D', 'RWTexture3D',
-        'SamplerState', 'SamplerComparisonState',
-        'float', 'float2', 'float3', 'float4', 'float2x2', 'float3x3', 'float4x4', 'half', 'min16float',
-        'int', 'int2', 'int3', 'int4', 'uint', 'uint2', 'uint3', 'uint4', 'bool', 'void', 'struct',
-        'if', 'else', 'for', 'while', 'return',
-        // semantics
-        'SV_Position', 'SV_Target', 'SV_Target0', 'SV_Target1', 'SV_VertexID', 'SV_InstanceID', 'SV_DispatchThreadID', 'SV_GroupThreadID', 'SV_GroupID', 'SV_GroupIndex'
-      ]
+  useEffect(() => {
+    const highlightCode = async () => {
+      try {
+        const highlighter = await createHighlighter({
+          themes: ['github-dark'],
+          langs: ['javascript', 'typescript', 'cpp', 'python', 'glsl', 'hlsl', 'css', 'html', 'xml', 'json', 'bash']
+        })
+        
+        const normalizedLanguage = getNormalizedLanguage(language)
+        const result = highlighter.codeToHtml(code, {
+          lang: normalizedLanguage,
+          theme: 'github-dark'
+        })
+        
+        setHighlightedCode(result)
+      } catch (error) {
+        console.error('代码高亮失败:', error)
+        // 失败时使用简单转义
+        const escapedCode = code
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+        setHighlightedCode(`<pre><code>${escapedCode}</code></pre>`)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    const normalized = (lang || '').toLowerCase()
-    const aliasMap: { [key: string]: keyof typeof keywords } = {
-      js: 'javascript', jsx: 'javascript', javascript: 'javascript',
-      ts: 'typescript', tsx: 'typescript', typescript: 'typescript',
-      c: 'cpp', cc: 'cpp', cpp: 'cpp', 'c++': 'cpp', h: 'cpp',hpp: 'cpp',
-      py: 'python', python: 'python',
-      glsl: 'glsl', vert: 'glsl', frag: 'glsl', geom: 'glsl',
-      hlsl: 'hlsl', fx: 'hlsl', fxc: 'hlsl'
+    highlightCode()
+  }, [code, language])
+
+  const getNormalizedLanguage = (lang: string): string => {
+    const langMap: { [key: string]: string } = {
+      'javascript': 'javascript',
+      'js': 'javascript',
+      'typescript': 'typescript',
+      'ts': 'typescript',
+      'jsx': 'javascript',
+      'tsx': 'typescript',
+      'cpp': 'cpp',
+      'c++': 'cpp',
+      'c': 'cpp',
+      'cc': 'cpp',
+      'h': 'cpp',
+      'hpp': 'cpp',
+      'python': 'python',
+      'py': 'python',
+      'glsl': 'glsl',
+      'vert': 'glsl',
+      'frag': 'glsl',
+      'geom': 'glsl',
+      'hlsl': 'hlsl',
+      'fx': 'hlsl',
+      'fxc': 'hlsl',
+      'css': 'css',
+      'scss': 'css',
+      'sass': 'css',
+      'html': 'html',
+      'xml': 'xml',
+      'json': 'json',
+      'bash': 'bash',
+      'shell': 'bash',
+      'sh': 'bash',
+      'sql': 'sql',
+      'java': 'java',
+      'rust': 'rust',
+      'go': 'go',
+      'php': 'php',
+      'ruby': 'ruby',
+      'yaml': 'yaml',
+      'yml': 'yaml',
+      'toml': 'toml',
+      'markdown': 'markdown',
+      'md': 'markdown'
     }
-    const resolvedLang = aliasMap[normalized] || (normalized in keywords ? (normalized as keyof typeof keywords) : 'cpp')
-    const langKeywords = keywords[resolvedLang] || keywords.cpp
-
-    // 1) Strings (real quotes)
-    highlighted = highlighted.replace(/"(?:[^"\\]|\\.)*"/g, '<span class="string">$&</span>')
-    highlighted = highlighted.replace(/'(?:[^'\\]|\\.)*'/g, '<span class="string">$&</span>')
-
-    // 2) Comments (// and /* */), Python uses # for comments
-    highlighted = highlighted.replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
-    highlighted = highlighted.replace(/\/\*[\s\S]*?\*\//g, '<span class="comment">$&</span>')
-    if (resolvedLang === 'python') {
-      highlighted = highlighted.replace(/#.*$/gm, '<span class="comment">$&</span>')
-    } else {
-      // Preprocessor like #include/#define treated as builtins for C/C++/HLSL/GLSL
-      highlighted = highlighted.replace(/^\s*#\s*\w+.*$/gm, '<span class="builtin">$&</span>')
-    }
-
-    // 3) Keywords (safe boundaries)
-    const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')
-    langKeywords.sort((a, b) => b.length - a.length).forEach(keyword => {
-      const escaped = escapeRegExp(keyword)
-      const regex = new RegExp(`(?<![A-Za-z0-9_])${escaped}(?![A-Za-z0-9_])`, 'g')
-      highlighted = highlighted.replace(regex, `<span class=\"keyword\">${keyword}</span>`)
-    })
-
-    // Highlight numbers
-    highlighted = highlighted.replace(/\b\d+\.?\d*f?\b/g, '<span class="number">$&</span>')
-
-    // Highlight function calls
-    highlighted = highlighted.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g, '<span class="function">$1</span>(')
-
-    // Highlight ALL_CAPS constants/macros
-    highlighted = highlighted.replace(/\b[A-Z_]{2,}\b/g, '<span class="builtin">$&</span>')
-
-    return highlighted
+    return langMap[lang.toLowerCase()] || 'plaintext'
   }
 
-  // Get language display name
   const getLanguageLabel = (lang: string) => {
     const labels: { [key: string]: string } = {
       'javascript': 'JavaScript',
@@ -123,9 +131,18 @@ const CodeBlock = ({ code, language, title, showLineNumbers = false }: CodeBlock
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="code-block relative bg-gray-900 rounded-2xl overflow-hidden my-6">
+        <div className="p-4">
+          <div className="animate-pulse bg-gray-800 h-6 rounded"></div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="code-block relative bg-gray-900 rounded-2xl overflow-hidden my-6 group animate-fade-in-up glass-highlight glass-noise">
-      {/* Header */}
       <div className="code-header flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
         <div className="flex items-center space-x-2">
           <div className="flex space-x-1">
@@ -151,28 +168,19 @@ const CodeBlock = ({ code, language, title, showLineNumbers = false }: CodeBlock
         </button>
       </div>
 
-      {/* Code Content */}
       <div className="relative">
         <div className={`p-4 overflow-x-auto ${showLineNumbers ? 'pl-16' : ''}`}>
-          <pre
-            className="text-sm text-gray-100"
+          <div 
+            dangerouslySetInnerHTML={{ __html: highlightedCode }}
+            className="shiki-code-block"
             style={{
               fontFamily: 'Fira Code, Monaco, Consolas, "Ubuntu Mono", monospace',
-              lineHeight: '1.6'
+              lineHeight: '1.6',
+              fontSize: '14px'
             }}
-          >
-            <code
-              className={`language-${language} block`}
-              style={{
-                fontFamily: 'Fira Code, Monaco, Consolas, "Ubuntu Mono", monospace',
-                lineHeight: '1.6'
-              }}
-              dangerouslySetInnerHTML={{ __html: highlightCode(code, language) }}
-            />
-          </pre>
+          />
         </div>
 
-        {/* Line numbers */}
         {showLineNumbers && (
           <div className="absolute left-0 top-0 bottom-0 w-12 bg-gray-800 border-r border-gray-700 flex flex-col text-gray-500 text-xs pt-4">
             {code.split('\n').map((_, index) => (
@@ -183,7 +191,6 @@ const CodeBlock = ({ code, language, title, showLineNumbers = false }: CodeBlock
           </div>
         )}
 
-        {/* Gradient overlay for long code */}
         <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-gray-900 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
     </div>
