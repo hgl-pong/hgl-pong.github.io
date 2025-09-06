@@ -63,6 +63,7 @@ export default function AboutPage() {
                   fill
                   className="object-cover"
                   priority
+                  loading="eager"
                 />
               </div>
               <h1 className="text-4xl font-bold text-white mb-4">关于我</h1>
