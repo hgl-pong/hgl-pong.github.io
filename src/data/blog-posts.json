@@ -1,0 +1,405 @@
+{
+  "posts": [
+    {
+      "id": "directx11-rendering-pipeline",
+      "title": "DirectX 11渲染管线深度解析",
+      "subtitle": "DirectX 11 Rendering Pipeline",
+      "category": "DirectX",
+      "author": "HGL",
+      "date": "2024-01-15",
+      "readTime": "10分钟",
+      "excerpt": "深入探讨DirectX 11的渲染管线架构，包括输入装配器、顶点着色器、像素着色器等各个阶段的详细实现，以及如何优化渲染性能...",
+      "tags": ["DirectX 11", "渲染管线", "HLSL"],
+      "featured": false,
+      "published": true,
+      "content": [
+        {
+          "type": "heading",
+          "level": 2,
+          "id": "overview",
+          "text": "DirectX 11渲染管线概述"
+        },
+        {
+          "type": "paragraph",
+          "text": "DirectX 11的渲染管线是现代图形编程的核心，它定义了从3D几何数据到最终像素输出的完整流程。理解渲染管线的每个阶段对于开发高性能的游戏引擎至关重要。"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "stages",
+          "text": "渲染管线的主要阶段"
+        },
+        {
+          "type": "paragraph",
+          "text": "DirectX 11渲染管线包含以下主要阶段："
+        },
+        {
+          "type": "list",
+          "items": [
+            "**输入装配器 (Input Assembler)** - 处理顶点数据和索引",
+            "**顶点着色器 (Vertex Shader)** - 变换顶点位置和属性",
+            "**曲面细分着色器 (Tessellation Shaders)** - 可选的几何细分",
+            "**几何着色器 (Geometry Shader)** - 可选的几何处理",
+            "**光栅化器 (Rasterizer)** - 将几何图形转换为像素",
+            "**像素着色器 (Pixel Shader)** - 计算最终像素颜色",
+            "**输出合并器 (Output Merger)** - 处理深度测试和混合"
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "input-assembler",
+          "text": "输入装配器阶段"
+        },
+        {
+          "type": "paragraph",
+          "text": "输入装配器负责从内存中读取顶点数据，并将其组装成图元（如三角形、线段等）。这个阶段的配置直接影响渲染性能。"
+        },
+        {
+          "type": "code",
+          "language": "cpp",
+          "code": "// 设置顶点缓冲区\nUINT stride = sizeof(Vertex);\nUINT offset = 0;\ndeviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);\n\n// 设置索引缓冲区\ndeviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);\n\n// 设置图元拓扑\ndeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "vertex-shader",
+          "text": "顶点着色器阶段"
+        },
+        {
+          "type": "paragraph",
+          "text": "顶点着色器是可编程管线阶段，负责变换顶点位置、计算光照和纹理坐标。每个顶点都会执行一次顶点着色器程序。"
+        },
+        {
+          "type": "code",
+          "language": "hlsl",
+          "code": "// 顶点着色器示例\ncbuffer MatrixBuffer : register(b0)\n{\n    matrix worldMatrix;\n    matrix viewMatrix;\n    matrix projectionMatrix;\n};\n\nstruct VertexInput\n{\n    float4 position : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n};\n\nstruct VertexOutput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n};\n\nVertexOutput main(VertexInput input)\n{\n    VertexOutput output;\n    \n    // 变换顶点位置\n    float4 worldPos = mul(input.position, worldMatrix);\n    float4 viewPos = mul(worldPos, viewMatrix);\n    output.position = mul(viewPos, projectionMatrix);\n    \n    // 传递世界坐标和法线\n    output.worldPos = worldPos.xyz;\n    output.normal = mul(input.normal, (float3x3)worldMatrix);\n    output.texCoord = input.texCoord;\n    \n    return output;\n}"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "pixel-shader",
+          "text": "像素着色器阶段"
+        },
+        {
+          "type": "paragraph",
+          "text": "像素着色器计算每个像素的最终颜色。这是实现各种视觉效果的关键阶段，包括光照、纹理采样、材质计算等。"
+        },
+        {
+          "type": "code",
+          "language": "hlsl",
+          "code": "// 像素着色器示例\nTexture2D diffuseTexture : register(t0);\nSamplerState textureSampler : register(s0);\n\ncbuffer LightBuffer : register(b0)\n{\n    float3 lightDirection;\n    float lightIntensity;\n    float4 lightColor;\n};\n\nstruct PixelInput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n};\n\nfloat4 main(PixelInput input) : SV_TARGET\n{\n    // 采样漫反射纹理\n    float4 textureColor = diffuseTexture.Sample(textureSampler, input.texCoord);\n    \n    // 计算光照\n    float3 normalizedNormal = normalize(input.normal);\n    float lightFactor = max(dot(normalizedNormal, -lightDirection), 0.0f);\n    \n    // 计算最终颜色\n    float4 finalColor = textureColor * lightColor * lightFactor * lightIntensity;\n    finalColor.a = textureColor.a;\n    \n    return finalColor;\n}"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "optimization",
+          "text": "性能优化技巧"
+        },
+        {
+          "type": "paragraph",
+          "text": "优化DirectX 11渲染性能的关键技巧："
+        },
+        {
+          "type": "list",
+          "items": [
+            "**批处理** - 减少Draw Call数量",
+            "**实例化渲染** - 高效渲染大量相似对象",
+            "**纹理图集** - 减少纹理切换开销",
+            "**LOD系统** - 根据距离调整细节级别",
+            "**视锥剔除** - 避免渲染不可见对象"
+          ]
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "summary",
+          "text": "总结"
+        },
+        {
+          "type": "paragraph",
+          "text": "DirectX 11渲染管线为现代游戏开发提供了强大而灵活的图形渲染能力。深入理解每个阶段的工作原理和优化方法，是开发高性能游戏引擎的基础。通过合理的设计和优化，可以充分发挥现代GPU的计算能力。"
+        }
+      ],
+      "navigation": {
+        "prev": {
+          "title": "PhysX物理引擎集成实战",
+          "slug": "physx-integration-guide"
+        },
+        "next": {
+          "title": "HLSL着色器编程技巧",
+          "slug": "hlsl-shader-programming"
+        }
+      }
+    },
+    {
+      "id": "hlsl-shader-programming",
+      "title": "HLSL着色器编程技巧",
+      "subtitle": "HLSL Shader Programming",
+      "category": "HLSL",
+      "author": "HGL",
+      "date": "2024-01-05",
+      "readTime": "12分钟",
+      "excerpt": "分享HLSL着色器开发中的实用技巧，包括顶点着色器、像素着色器的优化方法，以及常用的视觉效果实现...",
+      "tags": ["HLSL", "着色器", "渲染"],
+      "featured": false,
+      "published": true,
+      "content": [
+        {
+          "type": "heading",
+          "level": 2,
+          "id": "intro",
+          "text": "HLSL着色器编程简介"
+        },
+        {
+          "type": "paragraph",
+          "text": "HLSL（High-Level Shading Language）是微软开发的着色器语言，用于DirectX图形编程。它提供了强大的GPU编程能力，可以创建各种视觉效果，从简单的颜色变换到复杂的光照模型。"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "basics",
+          "text": "HLSL基础语法"
+        },
+        {
+          "type": "paragraph",
+          "text": "HLSL的语法与C语言类似，但有一些特殊的类型和关键字："
+        },
+        {
+          "type": "code",
+          "language": "hlsl",
+          "code": "// 基本数据类型\nfloat4 position : POSITION;  // 4D浮点向量\nfloat3 normal : NORMAL;      // 3D浮点向量\nfloat2 texCoord : TEXCOORD0; // 2D浮点向量\nfloat4 color : COLOR;         // 颜色值\n\n// 矩阵类型\nfloat4x4 worldMatrix;\nfloat3x3 normalMatrix;\n\n// 常量缓冲区\ncbuffer MatrixBuffer : register(b0)\n{\n    float4x4 worldViewProj;\n    float4x4 worldMatrix;\n    float3 lightDirection;\n    float padding;\n};\n\n// 纹理和采样器\nTexture2D diffuseTexture : register(t0);\nSamplerState linearSampler : register(s0);"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "vertex",
+          "text": "顶点着色器"
+        },
+        {
+          "type": "paragraph",
+          "text": "顶点着色器处理每个顶点的数据，包括位置变换、法线计算、纹理坐标传递等："
+        },
+        {
+          "type": "code",
+          "language": "hlsl",
+          "code": "// 顶点着色器示例\nstruct VertexInput\n{\n    float4 position : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n    float4 color : COLOR;\n};\n\nstruct VertexOutput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : TEXCOORD0;\n    float3 normal : TEXCOORD1;\n    float2 texCoord : TEXCOORD2;\n    float4 color : COLOR;\n};\n\nVertexOutput main(VertexInput input)\n{\n    VertexOutput output;\n    \n    // 变换位置到裁剪空间\n    output.position = mul(input.position, worldViewProj);\n    \n    // 计算世界坐标位置\n    output.worldPos = mul(input.position, worldMatrix).xyz;\n    \n    // 变换法线到世界空间\n    output.normal = normalize(mul(input.normal, (float3x3)worldMatrix));\n    \n    // 传递纹理坐标和颜色\n    output.texCoord = input.texCoord;\n    output.color = input.color;\n    \n    return output;\n}"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "pixel",
+          "text": "像素着色器"
+        },
+        {
+          "type": "paragraph",
+          "text": "像素着色器处理每个像素的颜色计算，包括纹理采样、光照计算、材质混合等："
+        },
+        {
+          "type": "code",
+          "language": "hlsl",
+          "code": "// 像素着色器示例\nstruct PixelInput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : TEXCOORD0;\n    float3 normal : TEXCOORD1;\n    float2 texCoord : TEXCOORD2;\n    float4 color : COLOR;\n};\n\n// Phong光照模型\nfloat4 CalculatePhongLighting(float3 worldPos, float3 normal, float3 lightDir, float3 viewDir)\n{\n    // 环境光\n    float3 ambient = float3(0.1, 0.1, 0.1);\n    \n    // 漫反射\n    float diff = max(dot(normal, lightDir), 0.0);\n    float3 diffuse = diff * float3(1.0, 1.0, 1.0);\n    \n    // 镜面反射\n    float3 reflectDir = reflect(-lightDir, normal);\n    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);\n    float3 specular = spec * float3(1.0, 1.0, 1.0);\n    \n    return float4(ambient + diffuse + specular, 1.0);\n}\n\nfloat4 main(PixelInput input) : SV_TARGET\n{\n    // 采样纹理\n    float4 texColor = diffuseTexture.Sample(linearSampler, input.texCoord);\n    \n    // 计算光照\n    float3 lightDir = normalize(-lightDirection);\n    float3 viewDir = normalize(cameraPosition - input.worldPos);\n    float4 lighting = CalculatePhongLighting(input.worldPos, input.normal, lightDir, viewDir);\n    \n    // 最终颜色\n    float4 finalColor = texColor * input.color * lighting;\n    finalColor.a = texColor.a;\n    \n    return finalColor;\n}"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "advanced",
+          "text": "高级着色器技术"
+        },
+        {
+          "type": "paragraph",
+          "text": "HLSL还支持许多高级着色器技术，可以实现更复杂的视觉效果："
+        },
+        {
+          "type": "code",
+          "language": "hlsl",
+          "code": "// 法线贴图\nfloat3 CalculateNormalFromMap(float2 texCoord, float3 normal, float3 tangent)\n{\n    float3 normalMap = normalTexture.Sample(linearSampler, texCoord).rgb;\n    normalMap = normalMap * 2.0 - 1.0; // 转换到[-1,1]范围\n    \n    float3 bitangent = cross(normal, tangent);\n    float3x3 tbnMatrix = float3x3(tangent, bitangent, normal);\n    \n    return normalize(mul(normalMap, tbnMatrix));\n}\n\n// 视差贴图\nfloat2 CalculateParallaxOffset(float2 texCoord, float3 viewDir)\n{\n    float height = heightTexture.Sample(linearSampler, texCoord).r;\n    float2 offset = viewDir.xy * height * parallaxScale;\n    return texCoord - offset;\n}\n\n// 环境光遮蔽\nfloat CalculateAmbientOcclusion(float3 worldPos, float3 normal)\n{\n    float ao = 0.0;\n    float radius = 0.5;\n    int samples = 8;\n    \n    for (int i = 0; i < samples; i++) {\n        float3 samplePos = worldPos + randomDirection[i] * radius;\n        float depth = SampleDepth(samplePos);\n        ao += step(samplePos.z, depth);\n    }\n    \n    return 1.0 - (ao / samples);\n}"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "optimization",
+          "text": "性能优化"
+        },
+        {
+          "type": "paragraph",
+          "text": "着色器性能优化对游戏渲染性能至关重要："
+        },
+        {
+          "type": "list",
+          "items": [
+            "**减少分支** - 避免在着色器中使用过多的if-else语句",
+            "**纹理压缩** - 使用BCn系列压缩格式减少带宽",
+            "**LOD系统** - 根据距离使用不同精度的着色器",
+            "**提前剔除** - 使用alpha test和depth test",
+            "**批处理** - 减少状态切换和draw call"
+          ]
+        },
+        {
+          "type": "code",
+          "language": "hlsl",
+          "code": "// 优化示例：使用lerp替代if\n// 不好的做法\nif (factor > 0.5) {\n    result = color1;\n} else {\n    result = color2;\n}\n\n// 好的做法\nresult = lerp(color2, color1, step(0.5, factor));\n\n// 纹理采样优化\nfloat4 SampleTextureLOD(float2 texCoord, float lod)\n{\n    // 根据距离选择不同的纹理\n    if (lod < 0.5) {\n        return highResTexture.Sample(linearSampler, texCoord);\n    } else if (lod < 1.5) {\n        return medResTexture.Sample(linearSampler, texCoord);\n    } else {\n        return lowResTexture.Sample(linearSampler, texCoord);\n    }\n}\n\n// 计算着色器优化\n[numthreads(8, 8, 1)]\nvoid CSMain(uint3 id : SV_DispatchThreadID)\n{\n    // 共享内存优化\n    groupshared float sharedData[64];\n    \n    // 线程同步\n    GroupMemoryBarrierWithGroupSync();\n    \n    // 减少全局内存访问\n    float localValue = sharedData[id.x % 8 + id.y % 8 * 8];\n}"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "summary",
+          "text": "总结"
+        },
+        {
+          "type": "paragraph",
+          "text": "HLSL着色器编程是现代图形编程的核心技能。通过掌握HLSL的语法特性和优化技巧，可以创建出令人印象深刻的视觉效果。在实际开发中，需要根据具体需求选择合适的着色器技术，并在视觉效果和性能之间找到平衡。"
+        }
+      ],
+      "navigation": {
+        "prev": {
+          "title": "DirectX 11渲染管线深度解析",
+          "slug": "directx11-rendering-pipeline"
+        },
+        "next": {
+          "title": "PhysX物理引擎集成实战",
+          "slug": "physx-integration-guide"
+        }
+      }
+    },
+    {
+      "id": "physx-integration-guide",
+      "title": "PhysX物理引擎集成实战",
+      "subtitle": "PhysX Integration Guide",
+      "category": "PhysX",
+      "author": "HGL",
+      "date": "2024-01-10",
+      "readTime": "12分钟",
+      "excerpt": "从零开始集成PhysX物理引擎到游戏项目中，包括刚体物理、碰撞检测、约束系统等核心功能的实现和优化技巧...",
+      "tags": ["PhysX", "物理引擎", "碰撞检测"],
+      "featured": false,
+      "published": true,
+      "content": [
+        {
+          "type": "heading",
+          "level": 2,
+          "id": "intro",
+          "text": "PhysX物理引擎简介"
+        },
+        {
+          "type": "paragraph",
+          "text": "PhysX是NVIDIA开发的实时物理引擎，广泛应用于游戏开发中。它提供了刚体动力学、软体模拟、流体模拟、布料模拟等丰富的物理效果。本文将详细介绍如何在自研游戏引擎中集成PhysX。"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "setup",
+          "text": "环境配置"
+        },
+        {
+          "type": "paragraph",
+          "text": "首先需要下载并配置PhysX SDK："
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "从NVIDIA官网下载PhysX SDK",
+            "解压到项目目录",
+            "配置Visual Studio项目设置"
+          ]
+        },
+        {
+          "type": "code",
+          "language": "cpp",
+          "code": "// 项目配置示例\n// 包含目录\n$(PhysXSDK)/Include\n$(PhysXSDK)/Include/common\n$(PhysXSDK)/Include/geometry\n$(PhysXSDK)/Include/foundation\n\n// 库目录\n$(PhysXSDK)/Lib/$(Platform)/$(Configuration)\n\n// 链接库\nPhysX_64.lib\nPhysXCommon_64.lib\nPhysXFoundation_64.lib\nPhysXCooking_64.lib"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "init",
+          "text": "初始化PhysX"
+        },
+        {
+          "type": "paragraph",
+          "text": "PhysX的初始化包括创建基金会、物理系统、场景等核心组件："
+        },
+        {
+          "type": "code",
+          "language": "cpp",
+          "code": "// PhysX初始化代码\n#include <PxPhysicsAPI.h>\n\nusing namespace physx;\n\nclass PhysicsManager {\nprivate:\n    PxFoundation* foundation;\n    PxPhysics* physics;\n    PxScene* scene;\n    PxDefaultAllocator allocator;\n    PxDefaultErrorCallback errorCallback;\n    \npublic:\n    bool Initialize() {\n        // 创建基金会\n        foundation = PxCreateFoundation(PX_PHYSICS_VERSION, allocator, errorCallback);\n        if (!foundation) return false;\n        \n        // 创建物理系统\n        physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, PxTolerancesScale());\n        if (!physics) return false;\n        \n        // 创建场景描述\n        PxSceneDesc sceneDesc(physics->getTolerancesScale());\n        sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);\n        sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(2);\n        sceneDesc.filterShader = PxDefaultSimulationFilterShader;\n        \n        // 创建场景\n        scene = physics->createScene(sceneDesc);\n        if (!scene) return false;\n        \n        return true;\n    }\n};"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "rigidbody",
+          "text": "刚体物理"
+        },
+        {
+          "type": "paragraph",
+          "text": "刚体是物理引擎中最基本的概念，它具有质量、速度、加速度等物理属性："
+        },
+        {
+          "type": "code",
+          "language": "cpp",
+          "code": "// 创建刚体\nPxRigidDynamic* CreateDynamicBox(const PxVec3& position, const PxVec3& halfSize, float density) {\n    // 创建形状\n    PxShape* shape = physics->createShape(PxBoxGeometry(halfSize), *material);\n    \n    // 创建刚体\n    PxTransform transform(position);\n    PxRigidDynamic* body = physics->createRigidDynamic(transform);\n    body->attachShape(*shape);\n    \n    // 计算质量和惯性\n    PxRigidBodyExt::updateMassAndInertia(*body, density);\n    \n    // 添加到场景\n    scene->addActor(*body);\n    \n    return body;\n}\n\n// 创建静态物体\nPxRigidStatic* CreateStaticBox(const PxVec3& position, const PxVec3& halfSize) {\n    // 创建形状\n    PxShape* shape = physics->createShape(PxBoxGeometry(halfSize), *material);\n    \n    // 创建静态物体\n    PxTransform transform(position);\n    PxRigidStatic* body = physics->createRigidStatic(transform);\n    body->attachShape(*shape);\n    \n    // 添加到场景\n    scene->addActor(*body);\n    \n    return body;\n}"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "collision",
+          "text": "碰撞检测"
+        },
+        {
+          "type": "paragraph",
+          "text": "PhysX提供了强大的碰撞检测系统，包括碰撞形状、过滤器和碰撞回调："
+        },
+        {
+          "type": "code",
+          "language": "cpp",
+          "code": "// 碰撞回调类\nclass CollisionCallback : public PxSimulationEventCallback {\npublic:\n    void onContact(const PxContactPairHeader& pairHeader, \n                   const PxContactPair* pairs, PxU32 nbPairs) override {\n        for (PxU32 i = 0; i < nbPairs; i++) {\n            const PxContactPair& cp = pairs[i];\n            \n            // 检查碰撞开始\n            if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND) {\n                std::cout << \"Collision detected!\" << std::endl;\n            }\n            \n            // 检查碰撞结束\n            if (cp.events & PxPairFlag::eNOTIFY_TOUCH_LOST) {\n                std::cout << \"Collision ended!\" << std::endl;\n            }\n        }\n    }\n    \n    // 其他回调函数...\n};\n\n// 设置碰撞过滤\nvoid SetupCollisionFiltering() {\n    PxFilterData filterData;\n    filterData.word0 = 0x1; // 类别1\n    filterData.word1 = 0x2; // 与类别2碰撞\n    \n    PxShape* shape = ...;\n    shape->setSimulationFilterData(filterData);\n}"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "optimization",
+          "text": "性能优化"
+        },
+        {
+          "type": "paragraph",
+          "text": "PhysX物理引擎的性能优化是游戏开发中的重要环节："
+        },
+        {
+          "type": "list",
+          "items": [
+            "**批处理** - 减少物理模拟的调用次数",
+            "**LOD系统** - 根据距离调整物理精度",
+            "**睡眠机制** - 静止物体进入睡眠状态",
+            "**区域划分** - 使用空间分区优化碰撞检测",
+            "**多线程** - 利用多核CPU进行并行计算"
+          ]
+        },
+        {
+          "type": "code",
+          "language": "cpp",
+          "code": "// 性能优化设置\nvoid OptimizePhysicsScene() {\n    // 设置时间步长\n    scene->setGravity(PxVec3(0.0f, -9.81f, 0.0f));\n    \n    // 启用睡眠机制\n    scene->setFlag(PxSceneFlag::eENABLE_CCD, true);\n    scene->setFlag(PxSceneFlag::eENABLE_ACTIVE_ACTORS, true);\n    \n    // 设置求解器迭代次数\n    scene->setSolverBatchSize(PxU32(50));\n    scene->setSolverIterationCount(4);\n    \n    // 启用连续碰撞检测\n    PxSetWarnOnDeprecatedAPI(true);\n}\n\n// 批处理物理更新\nvoid UpdatePhysics(float deltaTime) {\n    // 固定时间步长\n    const float fixedTimeStep = 1.0f / 60.0f;\n    accumulator += deltaTime;\n    \n    while (accumulator >= fixedTimeStep) {\n        scene->simulate(fixedTimeStep);\n        scene->fetchResults(true);\n        accumulator -= fixedTimeStep;\n    }\n}"
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "id": "summary",
+          "text": "总结"
+        },
+        {
+          "type": "paragraph",
+          "text": "PhysX物理引擎为游戏开发提供了强大而完整的物理模拟解决方案。通过合理的架构设计和性能优化，可以在游戏中实现逼真的物理效果。掌握PhysX的集成技术，是开发高质量3D游戏的重要技能。"
+        }
+      ],
+      "navigation": {
+        "prev": {
+          "title": "HLSL着色器编程技巧",
+          "slug": "hlsl-shader-programming"
+        },
+        "next": {
+          "title": "DirectX 11渲染管线深度解析",
+          "slug": "directx11-rendering-pipeline"
+        }
+      }
+    }
+  ]
+}

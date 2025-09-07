@@ -1,7 +1,7 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ScrollToTop from '@/components/ScrollToTop'
-// import PageTransition from '@/components/PageTransition'
+import PageTransition from '@/components/PageTransition'
 import Section from '@/components/ui/Section'
 import Typography from '@/components/ui/Typography'
 import Card from '@/components/ui/Card'
@@ -10,45 +10,16 @@ import { Calendar, Clock, Tag, Search } from 'lucide-react'
 import Link from 'next/link'
 // import { motion } from 'framer-motion'
 
-// 模拟博客数据
-const blogPosts = [
-  {
-    id: 1,
-    title: 'DirectX 11渲染管线深度解析',
-    excerpt: '深入探讨DirectX 11的渲染管线架构，包括输入装配器、顶点着色器、像素着色器等各个阶段的详细实现，以及如何优化渲染性能...',
-    date: '2024-01-15',
-    readTime: '10分钟',
-    category: 'DirectX',
-    tags: ['DirectX 11', '渲染管线', 'HLSL'],
-    slug: 'directx11-rendering-pipeline'
-  },
-  {
-    id: 2,
-    title: 'PhysX物理引擎集成实战',
-    excerpt: '从零开始集成PhysX物理引擎到游戏项目中，包括刚体物理、碰撞检测、约束系统等核心功能的实现和优化技巧...',
-    date: '2024-01-10',
-    readTime: '15分钟',
-    category: 'PhysX',
-    tags: ['PhysX', '物理引擎', 'C++'],
-    slug: 'physx-integration-guide'
-  },
-  {
-    id: 3,
-    title: 'HLSL着色器编程技巧',
-    excerpt: '分享HLSL着色器开发中的实用技巧，包括顶点着色器、像素着色器的优化方法，以及常用的视觉效果实现...',
-    date: '2024-01-05',
-    readTime: '12分钟',
-    category: 'HLSL',
-    tags: ['HLSL', '着色器', '渲染'],
-    slug: 'hlsl-shader-programming'
-  }
-]
+import { getAllPosts, getAllCategories } from '@/lib/posts'
+import { getAllTags } from '@/lib/utils'
 
-const categories = ['全部', 'DirectX', 'PhysX', 'HLSL', 'C++', '性能优化']
+const blogPosts = getAllPosts()
+const categories = ['全部', ...getAllCategories()]
+const allTags = getAllTags(blogPosts)
 
 export default function BlogPage() {
   return (
-    <div>
+    <PageTransition>
       <Header />
       <main className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
         {/* Page Header */}
@@ -109,7 +80,7 @@ export default function BlogPage() {
                       key={post.id}
                     >
                       <Card variant="professional" padding="lg" className="hover:shadow-xl transition-all duration-300 group">
-                        <Link href={`/blog/${post.slug}`}>
+                        <Link href={`/blog/${post.id}`}>
                           <div className="cursor-pointer">
                             {/* Category Badge */}
                             <div className="mb-3">
@@ -215,7 +186,7 @@ export default function BlogPage() {
                       热门标签
                     </Typography>
                     <div className="flex flex-wrap gap-2">
-                      {['DirectX 11', 'PhysX', 'HLSL', 'C++', '渲染管线', '物理引擎', '着色器', '性能优化'].map((tag) => (
+                      {allTags.slice(0, 8).map((tag) => (
                         <span
                           key={tag}
                           className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm border border-gray-200 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300 cursor-pointer"
@@ -234,7 +205,7 @@ export default function BlogPage() {
                     <div className="space-y-4">
                       {blogPosts.slice(0, 3).map((post) => (
                         <div key={post.id} className="group">
-                          <Link href={`/blog/${post.slug}`} className="block">
+                          <Link href={`/blog/${post.id}`} className="block">
                             <Typography variant="body" color="secondary" className="font-medium mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
                               {post.title}
                             </Typography>
@@ -254,6 +225,6 @@ export default function BlogPage() {
       </main>
       <Footer />
       <ScrollToTop />
-    </div>
+    </PageTransition>
   )
 }

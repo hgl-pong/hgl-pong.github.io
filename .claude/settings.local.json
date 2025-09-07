@@ -9,7 +9,8 @@
       "Bash(npm install --save-dev @types/prismjs)",
       "Bash(npx next build:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Read(//d//**)"
     ],
     "deny": [],
     "ask": []
