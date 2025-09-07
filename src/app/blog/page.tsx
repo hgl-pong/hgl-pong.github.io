@@ -1,7 +1,14 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import ScrollToTop from '@/components/ScrollToTop'
+// import PageTransition from '@/components/PageTransition'
+import Section from '@/components/ui/Section'
+import Typography from '@/components/ui/Typography'
+import Card from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
 import { Calendar, Clock, Tag, Search } from 'lucide-react'
 import Link from 'next/link'
+// import { motion } from 'framer-motion'
 
 // 模拟博客数据
 const blogPosts = [
@@ -41,116 +48,142 @@ const categories = ['全部', 'DirectX', 'PhysX', 'HLSL', 'C++', '性能优化']
 
 export default function BlogPage() {
   return (
-    <>
+    <div>
       <Header />
-      <main className="min-h-screen">
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
         {/* Page Header */}
-        <section className="bg-black/40 border-b border-white/10 py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Section variant="professional" padding="xl" className="min-h-[60vh] flex items-center relative overflow-hidden">
+          <div className="relative z-10 w-full">
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-white mb-4">技术博客</h1>
-              <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-                分享DirectX 11图形编程和PhysX物理引擎开发经验
-              </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-6">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                技术博客
+              </div>
+              
+              <Typography variant="h1" color="professional" className="leading-tight mb-4">
+                <span className="block">技术博客</span>
+                <span className="block text-3xl md:text-4xl font-normal text-gray-600 mt-2">
+                  Technical Blog
+                </span>
+              </Typography>
+              
+              <Typography variant="body" color="secondary" className="text-lg max-w-3xl mx-auto">
+                分享DirectX 11图形编程和PhysX物理引擎开发经验，
+                探索游戏引擎底层技术实现
+              </Typography>
             </div>
           </div>
-        </section>
+        </Section>
 
         {/* Blog Content */}
-        <section className="py-12">
+        <Section variant="professional" padding="lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex gap-8">
               {/* Main Content */}
               <div className="flex-1">
                 {/* Search and Filter */}
-                <div className="bg-black/40 rounded-3xl shadow-lg border border-white/10 p-6 mb-8 glass-highlight glass-noise">
+                <Card variant="professional" padding="lg" className="mb-8">
                   <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1 relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                       <input
                         type="text"
                         placeholder="搜索文章..."
-                        className="w-full pl-10 pr-4 py-2 border border-white/20 bg-black/30 text-gray-200 placeholder-gray-400 rounded-xl focus:ring-2 focus:ring-white/30 focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 bg-white text-gray-700 placeholder-gray-400 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300"
                       />
                     </div>
-                    <select className="px-4 py-2 border border-white/20 bg-black/30 text-gray-200 rounded-xl focus:ring-2 focus:ring-white/30 focus:border-transparent">
+                    <select className="px-4 py-3 border border-gray-300 bg-white text-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300 cursor-pointer">
                       {categories.map((category) => (
-                        <option key={category} value={category}>
+                        <option key={category} value={category} className="bg-white">
                           {category}
                         </option>
                       ))}
                     </select>
                   </div>
-                </div>
+                </Card>
 
                 {/* Blog Posts */}
                 <div className="space-y-8">
-                  {blogPosts.map((post) => (
-                    <article key={post.id} className="bg-black/40 rounded-3xl shadow-lg border border-white/10 p-6 hover:shadow-2xl transition-shadow glass-highlight glass-noise">
-                      <Link href={`/blog/${post.slug}`}>
-                        <div className="cursor-pointer">
-                          {/* Category Badge */}
-                          <div className="mb-3">
-                            <span className="inline-block bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm font-medium">
-                              {post.category}
-                            </span>
-                          </div>
-
-                          {/* Title */}
-                          <h2 className="text-2xl font-bold text-white mb-3 hover:text-gray-300 transition-colors">
-                            {post.title}
-                          </h2>
-
-                          {/* Excerpt */}
-                          <p className="text-gray-300 mb-4 leading-relaxed">
-                            {post.excerpt}
-                          </p>
-
-                          {/* Meta Info */}
-                          <div className="flex items-center space-x-4 text-sm text-gray-400 mb-4">
-                            <div className="flex items-center space-x-1">
-                              <Calendar size={16} />
-                              <span>{post.date}</span>
+                  {blogPosts.map((post, index) => (
+                    <article
+                      key={post.id}
+                    >
+                      <Card variant="professional" padding="lg" className="hover:shadow-xl transition-all duration-300 group">
+                        <Link href={`/blog/${post.slug}`}>
+                          <div className="cursor-pointer">
+                            {/* Category Badge */}
+                            <div className="mb-3">
+                              <span className="inline-block bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                {post.category}
+                              </span>
                             </div>
-                            <div className="flex items-center space-x-1">
-                              <Clock size={16} />
-                              <span>{post.readTime}</span>
-                            </div>
-                          </div>
 
-                          {/* Tags */}
-                          <div className="flex items-center space-x-2">
-                            <Tag size={16} className="text-gray-400" />
-                            <div className="flex space-x-2">
-                              {post.tags.slice(0, 2).map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="text-xs bg-white/10 text-gray-200 px-2 py-1 rounded"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                              {post.tags.length > 2 && (
-                                <span className="text-xs text-gray-400">
-                                  +{post.tags.length - 2}
-                                </span>
-                              )}
+                            {/* Title */}
+                            <Typography variant="h3" color="professional" className="mb-3 group-hover:text-blue-600 transition-colors">
+                              {post.title}
+                            </Typography>
+
+                            {/* Excerpt */}
+                            <Typography variant="body" color="secondary" className="mb-4 leading-relaxed line-clamp-3">
+                              {post.excerpt}
+                            </Typography>
+
+                            {/* Meta Info */}
+                            <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                              <div className="flex items-center space-x-1 group-hover:text-blue-600 transition-colors">
+                                <Calendar size={16} className="text-blue-500" />
+                                <span>{post.date}</span>
+                              </div>
+                              <div className="flex items-center space-x-1 group-hover:text-blue-600 transition-colors">
+                                <Clock size={16} className="text-blue-500" />
+                                <span>{post.readTime}</span>
+                              </div>
+                            </div>
+
+                            {/* Tags */}
+                            <div className="flex items-center space-x-2">
+                              <Tag size={16} className="text-blue-500" />
+                              <div className="flex flex-wrap gap-2">
+                                {post.tags.slice(0, 2).map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-md border border-gray-200 hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                                {post.tags.length > 2 && (
+                                  <span className="text-xs text-gray-500">
+                                    +{post.tags.length - 2}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </Link>
+                        </Link>
+                      </Card>
                     </article>
                   ))}
                 </div>
 
                 {/* Pagination */}
                 <div className="flex justify-center mt-12">
-                  <nav className="flex space-x-2">
-                    <button className="btn btn-secondary rounded-xl px-4 py-2 text-sm">上一页</button>
-                    <button className="btn btn-primary rounded-xl px-4 py-2 text-sm">1</button>
-                    <button className="btn btn-secondary rounded-xl px-4 py-2 text-sm">2</button>
-                    <button className="btn btn-secondary rounded-xl px-4 py-2 text-sm">3</button>
-                    <button className="btn btn-secondary rounded-xl px-4 py-2 text-sm">下一页</button>
+                  <nav className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm">
+                      上一页
+                    </Button>
+                    <Button variant="professional" size="sm">
+                      1
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      2
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      3
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      下一页
+                    </Button>
                   </nav>
                 </div>
               </div>
@@ -159,59 +192,68 @@ export default function BlogPage() {
               <div className="lg:w-1/3">
                 <div className="space-y-8">
                   {/* Categories */}
-                  <div className="bg-black/40 rounded-3xl shadow-lg border border-white/10 p-6 glass-highlight glass-noise">
-                    <h3 className="text-lg font-semibold text-white mb-4">技术分类</h3>
+                  <Card variant="professional" padding="lg">
+                    <Typography variant="h4" color="professional" className="mb-4">
+                      技术分类
+                    </Typography>
                     <div className="space-y-2">
                       {categories.slice(1).map((category) => (
                         <a
                           key={category}
                           href={`/blog?category=${category.toLowerCase()}`}
-                          className="block text-gray-300 hover:text-white py-1 transition-colors"
+                          className="block text-gray-600 hover:text-blue-600 py-2 px-3 rounded-lg hover:bg-blue-50 transition-all duration-300 border-l-2 border-transparent hover:border-blue-500"
                         >
                           {category}
                         </a>
                       ))}
                     </div>
-                  </div>
+                  </Card>
 
                   {/* Popular Tags */}
-                  <div className="bg-black/40 rounded-3xl shadow-lg border border-white/10 p-6 glass-highlight glass-noise">
-                    <h3 className="text-lg font-semibold text-white mb-4">热门标签</h3>
+                  <Card variant="professional" padding="lg">
+                    <Typography variant="h4" color="professional" className="mb-4">
+                      热门标签
+                    </Typography>
                     <div className="flex flex-wrap gap-2">
                       {['DirectX 11', 'PhysX', 'HLSL', 'C++', '渲染管线', '物理引擎', '着色器', '性能优化'].map((tag) => (
                         <span
                           key={tag}
-                          className="bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm hover:bg-white/20 hover:text-white cursor-pointer transition-colors"
+                          className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm border border-gray-200 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300 cursor-pointer"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
-                  </div>
+                  </Card>
 
                   {/* Recent Posts */}
-                  <div className="bg-black/40 rounded-3xl shadow-lg border border-white/10 p-6 glass-highlight glass-noise">
-                    <h3 className="text-lg font-semibold text-white mb-4">最新文章</h3>
+                  <Card variant="professional" padding="lg">
+                    <Typography variant="h4" color="professional" className="mb-4">
+                      最新文章
+                    </Typography>
                     <div className="space-y-4">
                       {blogPosts.slice(0, 3).map((post) => (
-                        <div key={post.id}>
-                          <Link href={`/blog/${post.slug}`} className="block hover:text-white transition-colors">
-                            <h4 className="font-medium text-white mb-1 line-clamp-2">
+                        <div key={post.id} className="group">
+                          <Link href={`/blog/${post.slug}`} className="block">
+                            <Typography variant="body" color="secondary" className="font-medium mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
                               {post.title}
-                            </h4>
-                            <p className="text-sm text-gray-400">{post.date}</p>
+                            </Typography>
+                            <Typography variant="caption" color="muted">
+                              {post.date}
+                            </Typography>
                           </Link>
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </Card>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </Section>
       </main>
       <Footer />
-    </>
+      <ScrollToTop />
+    </div>
   )
 }

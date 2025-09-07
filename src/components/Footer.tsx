@@ -1,151 +1,187 @@
 'use client'
 
-import { Github, Mail, Heart, ExternalLink } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Github, Mail, Linkedin, Code2, Heart, ExternalLink } from 'lucide-react'
+import { motion } from 'framer-motion'
+import Section from './ui/Section'
+import Typography from './ui/Typography'
+import Button from './ui/Button'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
-  const [isVisible, setIsVisible] = useState(false)
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.1 }
-    )
+  const quickLinks = [
+    { name: '首页', href: '/' },
+    { name: '技术博客', href: '/blog' },
+    { name: '项目展示', href: '/projects' },
+    { name: '关于我', href: '/about' },
+  ]
 
-    const footer = document.getElementById('footer')
-    if (footer) observer.observe(footer)
+  const categories = [
+    { name: 'DirectX 11', href: '/blog?category=directx' },
+    { name: 'PhysX物理', href: '/blog?category=physx' },
+    { name: 'HLSL着色器', href: '/blog?category=hlsl' },
+    { name: 'C++引擎', href: '/blog?category=cpp' },
+  ]
 
-    return () => observer.disconnect()
-  }, [])
+  const socialLinks = [
+    { name: 'GitHub', icon: <Github size={20} />, href: 'https://github.com', color: 'hover:text-gray-900' },
+    { name: 'LinkedIn', icon: <Linkedin size={20} />, href: 'https://linkedin.com', color: 'hover:text-blue-600' },
+    { name: 'Email', icon: <Mail size={20} />, href: 'mailto:contact@example.com', color: 'hover:text-red-600' },
+  ]
 
   return (
-    <footer id="footer" className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 light:from-white light:via-gray-100 light:to-white text-white light:text-gray-900 overflow-hidden">
-      {/* Modern Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-white/5 to-gray-500/5 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-br from-gray-500/5 to-white/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-gray-400/5 to-white/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
-      </div>
-
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 opacity-5" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h-2zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z'/%3E%3C/g%3E%3C/svg%3E")`
-      }}></div>
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid md:grid-cols-4 gap-8">
-          {/* Brand */}
-          <div className={`md:col-span-2 ${isVisible ? 'animate-fade-in-left' : 'opacity-0'}`}>
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-900 light:from-gray-200 light:to-gray-400 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">H</span>
+    <footer className="bg-gradient-to-b from-gray-50 to-white border-t border-gray-200">
+      <Section padding="lg" maxWidth="xl">
+        <div className="grid md:grid-cols-4 gap-8 mb-8">
+          {/* Brand Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="md:col-span-2 space-y-6"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-md">
+                <Code2 size={24} className="text-white" />
               </div>
-              <h3 className="text-3xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-300 light:from-gray-900 light:via-gray-700 light:to-gray-800 bg-clip-text text-transparent">
-                HGL博客
-              </h3>
+              <div>
+                <Typography variant="h4" color="professional">
+                  HGL
+                </Typography>
+                <Typography variant="caption" color="muted">
+                  Game Engine Developer
+                </Typography>
+              </div>
             </div>
 
-            <p className="text-gray-300 light:text-gray-700 mb-8 max-w-md leading-relaxed text-lg">
-              专注于DirectX 11和PhysX游戏引擎开发，记录C++底层编程和引擎架构的学习心得。
-              希望我的经验能帮助到更多的游戏开发者朋友。
-            </p>
+            <Typography variant="body" color="secondary" className="max-w-md leading-relaxed">
+              专注于DirectX 11和PhysX游戏引擎开发，致力于分享高质量的技术内容和实战经验。
+              帮助更多开发者掌握游戏引擎底层技术。
+            </Typography>
 
             <div className="flex space-x-4">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group p-3 bg-gray-800/50 light:bg-gray-200/60 hover:bg-gray-600 light:hover:bg-gray-300 rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-500/25"
-              >
-                <Github size={24} className="text-gray-300 light:text-gray-700 group-hover:text-white light:group-hover:text-gray-900 transition-colors duration-300" />
-              </a>
-              <a
-                href="mailto:contact@example.com"
-                className="group p-3 bg-gray-800/50 light:bg-gray-200/60 hover:bg-gray-600 light:hover:bg-gray-300 rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-500/25"
-              >
-                <Mail size={24} className="text-gray-300 light:text-gray-700 group-hover:text-white light:group-hover:text-gray-900 transition-colors duration-300" />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group p-3 bg-gray-800/50 light:bg-gray-200/60 hover:bg-gray-600 light:hover:bg-gray-300 rounded-xl transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-500/25"
-              >
-                <ExternalLink size={24} className="text-gray-300 light:text-gray-700 group-hover:text-white light:group-hover:text-gray-900 transition-colors duration-300" />
-              </a>
+              {socialLinks.map((social) => (
+                <motion.a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`p-3 bg-white border border-gray-200 rounded-lg text-gray-600 ${social.color} transition-all duration-300 hover:shadow-md`}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {social.icon}
+                </motion.a>
+              ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Quick Links */}
-          <div className={`${isVisible ? 'animate-fade-in-up animate-delay-200' : 'opacity-0'}`}>
-            <h4 className="text-lg font-semibold mb-4 text-gray-300 light:text-gray-700">快速链接</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="/" className="text-gray-300 light:text-gray-700 hover:text-white light:hover:text-gray-900 transition-all duration-300 hover:translate-x-2 block py-1">
-                  首页
-                </a>
-              </li>
-              <li>
-                <a href="/blog" className="text-gray-300 light:text-gray-700 hover:text-white light:hover:text-gray-900 transition-all duration-300 hover:translate-x-2 block py-1">
-                  博客
-                </a>
-              </li>
-              <li>
-                <a href="/about" className="text-gray-300 light:text-gray-700 hover:text-white light:hover:text-gray-900 transition-all duration-300 hover:translate-x-2 block py-1">
-                  关于
-                </a>
-              </li>
-              <li>
-                <a href="/contact" className="text-gray-300 light:text-gray-700 hover:text-white light:hover:text-gray-900 transition-all duration-300 hover:translate-x-2 block py-1">
-                  联系
-                </a>
-              </li>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Typography variant="h6" color="professional" className="mb-4">
+              快速导航
+            </Typography>
+            <ul className="space-y-3">
+              {quickLinks.map((link) => (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    className="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Categories */}
-          <div className={`${isVisible ? 'animate-fade-in-up animate-delay-300' : 'opacity-0'}`}>
-            <h4 className="text-lg font-semibold mb-4 text-gray-300 light:text-gray-700">技术分类</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="/blog?category=directx" className="text-gray-300 light:text-gray-700 hover:text-white light:hover:text-gray-900 transition-all duration-300 hover:translate-x-2 block py-1">
-                  DirectX 11
-                </a>
-              </li>
-              <li>
-                <a href="/blog?category=physx" className="text-gray-300 light:text-gray-700 hover:text-white light:hover:text-gray-900 transition-all duration-300 hover:translate-x-2 block py-1">
-                  PhysX物理
-                </a>
-              </li>
-              <li>
-                <a href="/blog?category=hlsl" className="text-gray-300 light:text-gray-700 hover:text-white light:hover:text-gray-900 transition-all duration-300 hover:translate-x-2 block py-1">
-                  HLSL着色器
-                </a>
-              </li>
-              <li>
-                <a href="/blog?category=cpp" className="text-gray-300 light:text-gray-700 hover:text-white light:hover:text-gray-900 transition-all duration-300 hover:translate-x-2 block py-1">
-                  C++引擎
-                </a>
-              </li>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Typography variant="h6" color="professional" className="mb-4">
+              技术分类
+            </Typography>
+            <ul className="space-y-3">
+              {categories.map((category) => (
+                <li key={category.name}>
+                  <a
+                    href={category.href}
+                    className="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm"
+                  >
+                    {category.name}
+                  </a>
+                </li>
+              ))}
             </ul>
-          </div>
+          </motion.div>
         </div>
 
+        {/* Newsletter Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-2xl p-8 mb-8"
+        >
+          <div className="text-center max-w-2xl mx-auto">
+            <Typography variant="h4" color="professional" className="mb-4">
+              订阅技术更新
+            </Typography>
+            <Typography variant="body" color="secondary" className="mb-6">
+              获取最新的游戏引擎开发技术文章和实战经验分享
+            </Typography>
+            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="输入您的邮箱地址"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <Button variant="professional">
+                订阅更新
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Bottom Bar */}
-        <div className={`border-t border-gray-800 light:border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center ${isVisible ? 'animate-fade-in-up animate-delay-400' : 'opacity-0'}`}>
-          <p className="text-gray-300 light:text-gray-700 text-sm hover:text-white light:hover:text-gray-900 transition-colors duration-300">
-            © {currentYear} HGL博客. 保留所有权利.
-          </p>
-          <p className="text-gray-300 light:text-gray-700 text-sm flex items-center mt-4 md:mt-0 hover:text-white light:hover:text-gray-900 transition-colors duration-300">
-            Made with <Heart size={16} className="mx-1 text-white light:text-gray-900 animate-pulse" /> using Next.js
-          </p>
-        </div>
-      </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-200"
+        >
+          <Typography variant="caption" color="muted">
+            © {currentYear} HGL. 保留所有权利.
+          </Typography>
+          
+          <div className="flex items-center gap-1 mt-4 md:mt-0">
+            <Typography variant="caption" color="muted">
+              Made with
+            </Typography>
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+            >
+              <Heart size={14} className="text-red-500 mx-1" />
+            </motion.div>
+            <Typography variant="caption" color="muted">
+              using Next.js
+            </Typography>
+          </div>
+        </motion.div>
+      </Section>
     </footer>
   )
 }

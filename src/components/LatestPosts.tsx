@@ -1,182 +1,277 @@
 'use client'
 
 import Link from 'next/link'
-import { Calendar, Clock, Tag, ArrowRight } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Calendar, Clock, ArrowRight, BookOpen, TrendingUp, Eye } from 'lucide-react'
+import { motion } from 'framer-motion'
+import Section from './ui/Section'
+import Typography from './ui/Typography'
+import Card from './ui/Card'
+import Button from './ui/Button'
+import ProfessionalBackground from './ui/ProfessionalBackground'
 
-// 模拟数据，后续会从实际数据源获取
-const mockPosts = [
+// 专业的模拟数据
+const featuredPosts = [
   {
     id: 1,
-    title: 'DirectX 11渲染管线深度解析',
-    excerpt: '深入探讨DirectX 11的渲染管线架构，包括输入装配器、顶点着色器、像素着色器等各个阶段的详细实现...',
+    title: 'DirectX 11渲染管线深度解析与性能优化',
+    excerpt: '深入探讨DirectX 11渲染管线的核心架构，包括输入装配器、顶点着色器、像素着色器等各个阶段的详细实现。通过实际案例分析如何进行渲染性能优化，提升游戏帧率表现。',
     date: '2024-01-15',
-    readTime: '10分钟',
+    readTime: '12分钟',
     category: 'DirectX',
-    tags: ['DirectX 11', '渲染管线', 'HLSL'],
-    slug: 'directx11-rendering-pipeline'
+    tags: ['DirectX 11', '渲染管线', 'HLSL', '性能优化'],
+    slug: 'directx11-rendering-pipeline',
+    views: '2.1k',
+    featured: true,
+    difficulty: '高级'
   },
   {
     id: 2,
-    title: 'PhysX物理引擎集成实战',
-    excerpt: '详细介绍如何在自研游戏引擎中集成PhysX物理引擎，包括刚体创建、碰撞检测、约束系统等核心功能...',
+    title: 'PhysX物理引擎集成实战指南',
+    excerpt: '详细介绍如何在自研游戏引擎中集成PhysX物理引擎，涵盖刚体创建、碰撞检测、约束系统等核心功能的实现。包含完整的代码示例和最佳实践。',
     date: '2024-01-10',
-    readTime: '12分钟',
+    readTime: '15分钟',
     category: 'PhysX',
-    tags: ['PhysX', '物理引擎', '碰撞检测'],
-    slug: 'physx-integration-guide'
+    tags: ['PhysX', '物理引擎', '碰撞检测', '游戏开发'],
+    slug: 'physx-integration-guide',
+    views: '1.8k',
+    featured: false,
+    difficulty: '中级'
   },
   {
     id: 3,
-    title: 'HLSL着色器编程技巧',
-    excerpt: '分享HLSL着色器开发中的实用技巧，包括光照模型、阴影映射、后处理效果等高级渲染技术...',
+    title: 'HLSL着色器编程进阶技巧',
+    excerpt: '分享HLSL着色器开发中的高级技巧，包括PBR光照模型、阴影映射、屏幕空间反射等现代渲染技术的实现方法和优化策略。',
     date: '2024-01-05',
-    readTime: '8分钟',
+    readTime: '10分钟',
     category: 'HLSL',
-    tags: ['HLSL', '着色器', '光照'],
-    slug: 'hlsl-shader-programming'
+    tags: ['HLSL', '着色器', 'PBR', '光照'],
+    slug: 'hlsl-shader-programming',
+    views: '1.5k',
+    featured: false,
+    difficulty: '高级'
   }
 ]
 
 const LatestPosts = () => {
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.1 }
-    )
-
-    const section = document.getElementById('latest-posts')
-    if (section) observer.observe(section)
-
-    return () => observer.disconnect()
-  }, [])
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case '初级': return 'bg-green-100 text-green-700 border-green-200'
+      case '中级': return 'bg-yellow-100 text-yellow-700 border-yellow-200'
+      case '高级': return 'bg-red-100 text-red-700 border-red-200'
+      default: return 'bg-gray-100 text-gray-700 border-gray-200'
+    }
+  }
 
   return (
-    <section id="latest-posts" className="py-24 relative">
-      {/* Background with subtle pattern */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/0 light:from-black/0 light:via-black/0 light:to-black/0"></div>
-      <div className="absolute inset-0 opacity-5" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-      }}></div>
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <Section variant="default" padding="xl" className="relative">
+      <ProfessionalBackground variant="subtle" />
+      
+      <div className="relative z-10">
         {/* Section Header */}
-        <div className={`text-center mb-16 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-gray-700 to-gray-900 rounded-2xl mb-6">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-            </svg>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-6">
+            <BookOpen size={16} />
+            技术分享
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            最新文章
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            分享最新的技术心得和项目经验，探索游戏引擎开发的前沿技术
-          </p>
-          <div className="mt-6 w-24 h-1 bg-gradient-to-r from-gray-700 to-gray-900 rounded-full mx-auto"></div>
-        </div>
+          
+          <Typography variant="h2" color="professional" className="mb-6">
+            最新技术文章
+          </Typography>
+          
+          <Typography variant="body" color="secondary" className="text-lg max-w-3xl mx-auto">
+            分享游戏引擎开发的核心技术和实战经验，帮助开发者掌握前沿技术
+          </Typography>
+        </motion.div>
 
-        {/* Posts Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {mockPosts.map((post, index) => (
-            <article
+        {/* Featured Post */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-12"
+        >
+          <Card variant="professional" padding="none" hover className="overflow-hidden">
+            <div className="grid md:grid-cols-2 gap-0">
+              {/* Content */}
+              <div className="p-8 lg:p-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-medium">
+                    精选文章
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(featuredPosts[0].difficulty)}`}>
+                    {featuredPosts[0].difficulty}
+                  </span>
+                </div>
+                
+                <Typography variant="h3" color="professional" className="mb-4 leading-tight">
+                  <Link href={`/blog/${featuredPosts[0].slug}`} className="hover:text-blue-600 transition-colors duration-300">
+                    {featuredPosts[0].title}
+                  </Link>
+                </Typography>
+                
+                <Typography variant="body" color="secondary" className="mb-6 leading-relaxed">
+                  {featuredPosts[0].excerpt}
+                </Typography>
+                
+                {/* Meta Info */}
+                <div className="flex items-center gap-6 mb-6 text-sm text-gray-500">
+                  <div className="flex items-center gap-1">
+                    <Calendar size={14} />
+                    <span>{featuredPosts[0].date}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock size={14} />
+                    <span>{featuredPosts[0].readTime}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Eye size={14} />
+                    <span>{featuredPosts[0].views}</span>
+                  </div>
+                </div>
+                
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {featuredPosts[0].tags.slice(0, 3).map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-200 transition-colors duration-300 cursor-pointer"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                
+                <Button variant="professional" rightIcon={<ArrowRight size={16} />}>
+                  阅读全文
+                </Button>
+              </div>
+              
+              {/* Visual */}
+              <div className="bg-gradient-to-br from-blue-50 to-teal-50 p-8 lg:p-10 flex items-center justify-center">
+                <div className="w-full max-w-sm">
+                  <div className="aspect-square bg-white rounded-2xl shadow-lg p-6 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <BookOpen size={32} className="text-white" />
+                      </div>
+                      <Typography variant="h5" color="professional" className="mb-2">
+                        深度技术
+                      </Typography>
+                      <Typography variant="caption" color="muted">
+                        专业解析
+                      </Typography>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Regular Posts Grid */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {featuredPosts.slice(1).map((post, index) => (
+            <motion.div
               key={post.id}
-              className={`
-                group relative overflow-hidden bg-black/40 backdrop-blur-sm border border-white/10 glass-highlight glass-noise
-                rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500
-                hover:transform hover:-translate-y-2 hover:scale-[1.02]
-                ${isVisible ? `animate-fade-in-up animate-delay-${(index + 1) * 200}` : 'opacity-0'}
-              `}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 + index * 0.2 }}
             >
-              <Link href={`/blog/${post.slug}`} className="block">
-                <div className="relative z-10">
-                  {/* Category Badge */}
-                  <div className="mb-6">
-                    <span className="inline-flex items-center px-4 py-2 bg-white/10 border border-white/20 rounded-full text-sm font-semibold text-gray-200 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                      <div className="w-2 h-2 bg-white/70 border border-white/30 rounded-full mr-2"></div>
+              <Card variant="professional" padding="lg" hover className="h-full">
+                <Link href={`/blog/${post.slug}`} className="block">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
                       {post.category}
                     </span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(post.difficulty)}`}>
+                      {post.difficulty}
+                    </span>
                   </div>
-
-                  {/* Title */}
-                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-gray-300 transition-all duration-300 leading-tight">
+                  
+                  <Typography variant="h4" color="professional" className="mb-3 leading-tight hover:text-blue-600 transition-colors duration-300">
                     {post.title}
-                    <div className="w-0 group-hover:w-full h-0.5 bg-gradient-to-r from-white/50 to-white transition-all duration-500 mt-2"></div>
-                  </h3>
-
-                  {/* Excerpt */}
-                  <p className="text-gray-300 mb-6 line-clamp-3 group-hover:text-gray-200 transition-colors duration-300 leading-relaxed">
+                  </Typography>
+                  
+                  <Typography variant="body" color="secondary" className="mb-4 leading-relaxed line-clamp-3">
                     {post.excerpt}
-                  </p>
-
+                  </Typography>
+                  
                   {/* Meta Info */}
-                  <div className="flex items-center justify-between text-sm text-gray-400 mb-6 pt-4 border-t border-white/10">
-                    <div className="flex items-center space-x-6">
-                      <div className="flex items-center space-x-2 hover:text-white transition-colors duration-300">
-                        <div className="p-1 bg-white/10 rounded-full">
-                          <Calendar size={14} />
-                        </div>
-                        <span className="font-medium">{post.date}</span>
+                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1">
+                        <Calendar size={14} />
+                        <span>{post.date}</span>
                       </div>
-                      <div className="flex items-center space-x-2 hover:text-white transition-colors duration-300">
-                        <div className="p-1 bg-white/10 rounded-full">
-                          <Clock size={14} />
-                        </div>
-                        <span className="font-medium">{post.readTime}</span>
+                      <div className="flex items-center gap-1">
+                        <Clock size={14} />
+                        <span>{post.readTime}</span>
                       </div>
                     </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <ArrowRight size={18} className="text-gray-300 transform group-hover:translate-x-1 transition-transform duration-300" />
+                    <div className="flex items-center gap-1">
+                      <TrendingUp size={14} />
+                      <span>{post.views}</span>
                     </div>
                   </div>
-
+                  
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2">
-                    {post.tags.slice(0, 3).map((tag, tagIndex) => (
+                    {post.tags.slice(0, 2).map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center px-3 py-1 bg-white/10 text-gray-200 text-xs font-medium rounded-full hover:bg-white/20 hover:text-white transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                        className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium"
                       >
-                        <Tag size={10} className="mr-1" />
                         {tag}
                       </span>
                     ))}
-                    {post.tags.length > 3 && (
-                      <span className="inline-flex items-center px-3 py-1 bg-white/10 text-gray-200 text-xs font-medium rounded-full">
-                        +{post.tags.length - 3}
+                    {post.tags.length > 2 && (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">
+                        +{post.tags.length - 2}
                       </span>
                     )}
                   </div>
-
-                  {/* Hover Overlay Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-500/5 via-white/5 to-gray-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
-
-                  {/* Decorative corner element */}
-                  <div className="absolute top-4 right-4 w-8 h-8 bg-gradient-to-br from-gray-400/20 to-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-              </Link>
-            </article>
+                </Link>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
-        {/* View All Button */}
-        <div className={`text-center ${isVisible ? 'animate-fade-in-up animate-delay-600' : 'opacity-0'}`}>
-          <Link href="/blog" className="btn btn-gradient btn-xl group inline-flex items-center">
-            <span>查看所有文章</span>
-            <ArrowRight size={20} className="transform group-hover:translate-x-1 transition-transform duration-300" />
-          </Link>
-          <p className="text-gray-500 text-sm mt-4">
-            探索更多技术文章和开发心得
-          </p>
-        </div>
+        {/* CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="text-center"
+        >
+          <Button 
+            variant="outline" 
+            size="lg"
+            rightIcon={<ArrowRight size={20} />}
+            className="group"
+          >
+            查看所有文章
+            <motion.div
+              className="ml-1"
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          </Button>
+          
+          <Typography variant="caption" color="muted" className="mt-4 block">
+            持续更新中，敬请期待更多技术分享
+          </Typography>
+        </motion.div>
       </div>
-    </section>
+    </Section>
   )
 }
 

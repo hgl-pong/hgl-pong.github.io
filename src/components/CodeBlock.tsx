@@ -21,66 +21,35 @@ const CodeBlock = ({ code, language, title, showLineNumbers = false }: CodeBlock
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
 
-    // Common keywords for different languages
-    const keywords: { [key: string]: string[] } = {
-      cpp: ['#include', 'class', 'public', 'private', 'protected', 'virtual', 'const', 'static', 'void', 'int', 'float', 'double', 'char', 'bool', 'if', 'else', 'for', 'while', 'return', 'new', 'delete', 'namespace', 'using', 'template', 'typename', 'struct'],
-      javascript: ['function', 'const', 'let', 'var', 'if', 'else', 'for', 'while', 'return', 'class', 'extends', 'import', 'export', 'default', 'async', 'await', 'try', 'catch', 'finally', 'this'],
-      typescript: ['function', 'const', 'let', 'var', 'if', 'else', 'for', 'while', 'return', 'class', 'extends', 'import', 'export', 'default', 'async', 'await', 'try', 'catch', 'finally', 'interface', 'type', 'enum', 'this'],
-      python: ['def', 'class', 'if', 'else', 'elif', 'for', 'while', 'return', 'import', 'from', 'as', 'try', 'except', 'finally', 'with', 'lambda', 'yield', 'self'],
-      glsl: ['attribute', 'uniform', 'varying', 'vec2', 'vec3', 'vec4', 'mat2', 'mat3', 'mat4', 'sampler2D', 'float', 'int', 'bool', 'void', 'if', 'else', 'for', 'while', 'return'],
-      hlsl: [
-        'cbuffer', 'StructuredBuffer', 'RWStructuredBuffer', 'Texture2D', 'Texture2DArray', 'Texture3D', 'RWTexture2D', 'RWTexture3D',
-        'SamplerState', 'SamplerComparisonState',
-        'float', 'float2', 'float3', 'float4', 'float2x2', 'float3x3', 'float4x4', 'half', 'min16float',
-        'int', 'int2', 'int3', 'int4', 'uint', 'uint2', 'uint3', 'uint4', 'bool', 'void', 'struct',
-        'if', 'else', 'for', 'while', 'return',
-        // semantics
-        'SV_Position', 'SV_Target', 'SV_Target0', 'SV_Target1', 'SV_VertexID', 'SV_InstanceID', 'SV_DispatchThreadID', 'SV_GroupThreadID', 'SV_GroupID', 'SV_GroupIndex'
-      ]
-    }
+    // Strings
+    highlighted = highlighted.replace(/"(?:[^"\\]|\\.)*"/g, '<span class="token string">$&</span>')
+    highlighted = highlighted.replace(/'(?:[^'\\]|\\.)*'/g, '<span class="token string">$&</span>')
 
-    const normalized = (lang || '').toLowerCase()
-    const aliasMap: { [key: string]: keyof typeof keywords } = {
-      js: 'javascript', jsx: 'javascript', javascript: 'javascript',
-      ts: 'typescript', tsx: 'typescript', typescript: 'typescript',
-      c: 'cpp', cc: 'cpp', cpp: 'cpp', 'c++': 'cpp', h: 'cpp',hpp: 'cpp',
-      py: 'python', python: 'python',
-      glsl: 'glsl', vert: 'glsl', frag: 'glsl', geom: 'glsl',
-      hlsl: 'hlsl', fx: 'hlsl', fxc: 'hlsl'
-    }
-    const resolvedLang = aliasMap[normalized] || (normalized in keywords ? (normalized as keyof typeof keywords) : 'cpp')
-    const langKeywords = keywords[resolvedLang] || keywords.cpp
-
-    // 1) Strings (real quotes)
-    highlighted = highlighted.replace(/"(?:[^"\\]|\\.)*"/g, '<span class="string">$&</span>')
-    highlighted = highlighted.replace(/'(?:[^'\\]|\\.)*'/g, '<span class="string">$&</span>')
-
-    // 2) Comments (// and /* */), Python uses # for comments
-    highlighted = highlighted.replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
-    highlighted = highlighted.replace(/\/\*[\s\S]*?\*\//g, '<span class="comment">$&</span>')
-    if (resolvedLang === 'python') {
-      highlighted = highlighted.replace(/#.*$/gm, '<span class="comment">$&</span>')
+    // Comments (// and /* */), Python uses # for comments
+    highlighted = highlighted.replace(/\/\/.*$/gm, '<span class="token comment">$&</span>')
+    highlighted = highlighted.replace(/\/\*[\s\S]*?\*\//g, '<span class="token comment">$&</span>')
+    if (lang.toLowerCase() === 'python') {
+      highlighted = highlighted.replace(/#.*$/gm, '<span class="token comment">$&</span>')
     } else {
-      // Preprocessor like #include/#define treated as builtins for C/C++/HLSL/GLSL
-      highlighted = highlighted.replace(/^\s*#\s*\w+.*$/gm, '<span class="builtin">$&</span>')
+      // Preprocessor like #include/#define
+      highlighted = highlighted.replace(/^\s*#\s*\w+.*$/gm, '<span class="token builtin">$&</span>')
     }
 
-    // 3) Keywords (safe boundaries)
-    const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')
-    langKeywords.sort((a, b) => b.length - a.length).forEach(keyword => {
-      const escaped = escapeRegExp(keyword)
-      const regex = new RegExp(`(?<![A-Za-z0-9_])${escaped}(?![A-Za-z0-9_])`, 'g')
-      highlighted = highlighted.replace(regex, `<span class=\"keyword\">${keyword}</span>`)
+    // Keywords
+    const keywords = ['if', 'else', 'for', 'while', 'return', 'function', 'class', 'const', 'let', 'var', 'int', 'void', 'bool', 'float', 'double', 'struct', 'public', 'private', 'protected', 'virtual', 'static', 'template', 'typename', 'using', 'namespace']
+    keywords.forEach(keyword => {
+      const regex = new RegExp(`\\b${keyword}\\b`, 'g')
+      highlighted = highlighted.replace(regex, '<span class="token keyword">$&</span>')
     })
 
-    // Highlight numbers
-    highlighted = highlighted.replace(/\b\d+\.?\d*f?\b/g, '<span class="number">$&</span>')
+    // Numbers
+    highlighted = highlighted.replace(/\b\d+\.?\d*f?\b/g, '<span class="token number">$&</span>')
 
-    // Highlight function calls
-    highlighted = highlighted.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g, '<span class="function">$1</span>(')
+    // Function calls
+    highlighted = highlighted.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g, '<span class="token function">$1</span>(')
 
-    // Highlight ALL_CAPS constants/macros
-    highlighted = highlighted.replace(/\b[A-Z_]{2,}\b/g, '<span class="builtin">$&</span>')
+    // Constants/macros
+    highlighted = highlighted.replace(/\b[A-Z_]{2,}\b/g, '<span class="token builtin">$&</span>')
 
     return highlighted
   }
@@ -113,6 +82,8 @@ const CodeBlock = ({ code, language, title, showLineNumbers = false }: CodeBlock
     return labels[lang] || lang.toUpperCase()
   }
 
+  const highlighted = highlightCode(code, language)
+
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(code)
@@ -124,14 +95,14 @@ const CodeBlock = ({ code, language, title, showLineNumbers = false }: CodeBlock
   }
 
   return (
-    <div className="code-block relative bg-gray-900 rounded-2xl overflow-hidden my-6 group animate-fade-in-up glass-highlight glass-noise">
+    <div className="code-block relative bg-gray-900 rounded-2xl overflow-hidden my-6 group animate-fade-in-up">
       {/* Header */}
       <div className="code-header flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
         <div className="flex items-center space-x-2">
           <div className="flex space-x-1">
-            <div className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"></div>
-            <div className="w-3 h-3 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-3 h-3 bg-gray-700 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           </div>
           {title && (
             <span className="text-gray-300 text-sm font-medium ml-3">{title}</span>
@@ -167,7 +138,7 @@ const CodeBlock = ({ code, language, title, showLineNumbers = false }: CodeBlock
                 fontFamily: 'Fira Code, Monaco, Consolas, "Ubuntu Mono", monospace',
                 lineHeight: '1.6'
               }}
-              dangerouslySetInnerHTML={{ __html: highlightCode(code, language) }}
+              dangerouslySetInnerHTML={{ __html: highlighted }}
             />
           </pre>
         </div>

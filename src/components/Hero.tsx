@@ -1,277 +1,270 @@
 'use client'
 
 import Image from 'next/image'
-import { Github, Mail, MapPin, Sparkles } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowRight, Code2, Database, Cpu, Github, Mail, MapPin } from 'lucide-react'
 import { motion } from 'framer-motion'
-import ParticleBackground from './ParticleBackground'
-import { Typewriter, HoverAnimation, ScrollAnimation } from './MotionWrapper'
+import Section from './ui/Section'
+import Typography from './ui/Typography'
+import Button from './ui/Button'
+import Card from './ui/Card'
+import ProfessionalBackground from './ui/ProfessionalBackground'
 
 const Hero = () => {
-  const [isVisible, setIsVisible] = useState(false)
+  const specializations = [
+    { name: 'DirectX 11', icon: <Code2 size={20} />, description: '图形渲染' },
+    { name: 'PhysX', icon: <Database size={20} />, description: '物理引擎' },
+    { name: 'HLSL', icon: <Cpu size={20} />, description: '着色器编程' }
+  ]
 
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
+  const stats = [
+    { value: '5+', label: '年开发经验' },
+    { value: '50+', label: '项目经验' },
+    { value: '10k+', label: '代码提交' }
+  ]
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Elegant Particle Background */}
-      <ParticleBackground theme="neon" />
-
-      {/* Background (dark default, light override) */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black light:from-white light:via-gray-100 light:to-white"></div>
-
-      {/* Subtle Animated Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Subtle floating orbs */}
-        <motion.div
-          className="absolute -top-40 -right-40 w-96 h-96 rounded-full"
-          animate={{
-            y: [0, -20, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          style={{
-            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%)',
-            filter: 'blur(40px)',
-          }}
-        />
-        <motion.div
-          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full"
-          animate={{
-            y: [0, 20, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2
-          }}
-          style={{
-            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.02) 0%, transparent 70%)',
-            filter: 'blur(40px)',
-          }}
-        />
-
-        {/* Minimal geometric shapes */}
-        <motion.div
-          className="absolute top-20 left-20 w-2 h-2 bg-white rounded-full opacity-30"
-          animate={{ opacity: [0.2, 0.5, 0.2] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute top-40 right-32 w-3 h-3 bg-gray-400 rounded-full opacity-20"
-          animate={{ opacity: [0.1, 0.3, 0.1] }}
-          transition={{ duration: 4, repeat: Infinity, delay: 1 }}
-        />
-        <motion.div
-          className="absolute bottom-32 left-1/3 w-1 h-1 bg-gray-300 rounded-full opacity-40"
-          animate={{ opacity: [0.2, 0.6, 0.2] }}
-          transition={{ duration: 2.5, repeat: Infinity, delay: 2 }}
-        />
-      </div>
-
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 z-10">
-        <div className="text-center">
-          {/* Elegant Avatar */}
+    <Section variant="professional" padding="xl" className="min-h-screen flex items-center relative overflow-hidden">
+      <ProfessionalBackground variant="geometric" />
+      
+      <div className="relative z-10 w-full">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left Column - Content */}
           <motion.div
-            className="mb-12"
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
+            className="space-y-8"
           >
-            <div className="relative w-40 h-40 mx-auto">
-              {/* Subtle rotating ring */}
-              <motion.div
-                className="absolute inset-0 rounded-full p-1"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                style={{
-                  background: 'linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1), rgba(255,255,255,0.2))',
-                }}
-              >
-                <div className="w-full h-full bg-black rounded-full"></div>
-              </motion.div>
-
-              {/* Avatar container */}
-              <HoverAnimation scale={1.05}>
-                <div className="absolute inset-2 rounded-full overflow-hidden shadow-2xl">
-                  <Image
-                    src="/avatar.jpg"
-                    alt="个人头像"
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                  {/* Subtle overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 rounded-full"></div>
-                </div>
-              </HoverAnimation>
-
-              {/* Minimal floating elements */}
-              <motion.div
-                className="absolute -top-3 -right-3 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg opacity-80"
-                animate={{
-                  y: [0, -8, 0],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                <Sparkles size={12} className="text-gray-900" />
-              </motion.div>
-              <motion.div
-                className="absolute -bottom-2 -left-3 w-4 h-4 bg-gray-300 rounded-full flex items-center justify-center shadow-lg opacity-60"
-                animate={{
-                  y: [0, 8, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 1
-                }}
-              >
-                <Sparkles size={8} className="text-gray-700" />
-              </motion.div>
-            </div>
-          </motion.div>
-
-          {/* Cyberpunk Name and Title */}
-          <motion.div
-            className="mb-8"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <Typewriter
-              text="HGL"
-              className="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-300 light:from-gray-900 light:via-gray-700 light:to-gray-800 bg-clip-text text-transparent leading-tight"
-              delay={0.5}
-              speed={0.2}
-            />
+            {/* Professional Badge */}
             <motion.div
-              className="relative"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 1.2 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full text-blue-700 text-sm font-medium"
             >
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-200 light:text-gray-900 mb-4">
-                游戏引擎开发工程师
-              </h2>
-              <motion.div
-                className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 h-1 bg-gradient-to-r from-white to-gray-400 light:from-gray-800 light:to-gray-600 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: 96 }}
-                transition={{ duration: 1, delay: 1.5 }}
-              />
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              专业游戏引擎开发工程师
+            </motion.div>
+
+            {/* Main Heading */}
+            <div className="space-y-4">
+              <Typography variant="h1" color="professional" className="leading-tight">
+                <span className="block">构建高性能</span>
+                <span className="block bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
+                  游戏引擎
+                </span>
+              </Typography>
+              
+              <Typography variant="body" color="secondary" className="text-lg max-w-xl">
+                专注于DirectX 11图形编程、PhysX物理引擎和C++游戏引擎开发。
+                分享底层技术实现和性能优化经验，助力游戏开发者提升技术水平。
+              </Typography>
+            </div>
+
+            {/* Specializations */}
+            <div className="flex flex-wrap gap-3">
+              {specializations.map((spec, index) => (
+                <motion.div
+                  key={spec.name}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <div className="text-blue-600">{spec.icon}</div>
+                  <div>
+                    <div className="font-medium text-gray-900">{spec.name}</div>
+                    <div className="text-xs text-gray-500">{spec.description}</div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-6 py-6">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
+                  className="text-center"
+                >
+                  <Typography variant="h3" color="accent" className="font-bold">
+                    {stat.value}
+                  </Typography>
+                  <Typography variant="caption" color="muted">
+                    {stat.label}
+                  </Typography>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
+              <Button 
+                variant="professional" 
+                size="lg"
+                rightIcon={<ArrowRight size={20} />}
+                className="group"
+              >
+                查看技术博客
+                <motion.div
+                  className="ml-1"
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="lg"
+                leftIcon={<Github size={20} />}
+              >
+                GitHub 项目
+              </Button>
+            </motion.div>
+
+            {/* Contact Info */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1 }}
+              className="flex items-center gap-6 pt-4 border-t border-gray-200"
+            >
+              <div className="flex items-center gap-2 text-gray-600">
+                <MapPin size={16} />
+                <span className="text-sm">中国</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600">
+                <Mail size={16} />
+                <span className="text-sm">联系合作</span>
+              </div>
             </motion.div>
           </motion.div>
 
-          {/* Elegant Specialization Tags */}
+          {/* Right Column - Professional Avatar & Cards */}
           <motion.div
-            className="flex flex-wrap justify-center gap-3 mb-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.8 }}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            className="relative"
           >
-            {['DirectX 11', 'PhysX物理引擎', 'HLSL着色器'].map((tag, index) => (
-              <motion.span
-                key={tag}
-                className="px-4 py-2 bg-white/10 border border-white/20 rounded-full text-gray-200 light:text-gray-800 font-medium text-sm backdrop-blur-sm"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{
-                  duration: 0.4,
-                  delay: 1.8 + index * 0.2,
-                  ease: "easeOut"
-                }}
-                whileHover={{
-                  scale: 1.05,
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  borderColor: 'rgba(255, 255, 255, 0.3)'
-                }}
-              >
-                {tag}
-              </motion.span>
-            ))}
+            {/* Main Avatar Card */}
+            <Card variant="professional" padding="lg" className="relative overflow-hidden">
+              <div className="flex flex-col items-center text-center space-y-6">
+                {/* Avatar */}
+                <div className="relative">
+                  <motion.div
+                    className="w-32 h-32 rounded-2xl overflow-hidden shadow-lg border-4 border-white"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Image
+                      src="/avatar.jpg"
+                      alt="HGL - 游戏引擎开发工程师"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </motion.div>
+                  
+                  {/* Status Indicator */}
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                  </div>
+                </div>
+
+                {/* Name & Title */}
+                <div className="space-y-2">
+                  <Typography variant="h4" color="professional">
+                    HGL
+                  </Typography>
+                  <Typography variant="body" color="muted">
+                    Senior Game Engine Developer
+                  </Typography>
+                </div>
+
+                {/* Professional Metrics */}
+                <div className="w-full grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                  <div className="text-center">
+                    <Typography variant="h5" color="accent">
+                      98%
+                    </Typography>
+                    <Typography variant="caption" color="muted">
+                      项目成功率
+                    </Typography>
+                  </div>
+                  <div className="text-center">
+                    <Typography variant="h5" color="accent">
+                      24h
+                    </Typography>
+                    <Typography variant="caption" color="muted">
+                      响应时间
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+
+              {/* Professional Badge */}
+            </Card>
+
+            {/* Floating Tech Cards */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="absolute -top-4 -left-4 z-10"
+            >
+              <Card variant="glass" padding="sm" className="backdrop-blur-md">
+                <div className="flex items-center gap-2">
+                  <Code2 size={16} className="text-blue-600" />
+                  <span className="text-sm font-medium">C++ 开发者</span>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 1 }}
+              className="absolute -bottom-4 -right-4 z-10"
+            >
+              <Card variant="glass" padding="sm" className="backdrop-blur-md">
+                <div className="flex items-center gap-2">
+                  <Database size={16} className="text-teal-600" />
+                  <span className="text-sm font-medium">DirectX 11</span>
+                </div>
+              </Card>
+            </motion.div>
           </motion.div>
-
-          {/* Clean Description */}
-          <motion.p
-            className="text-lg text-gray-300 light:text-gray-800 mb-10 max-w-3xl mx-auto leading-relaxed text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 2.4 }}
-          >
-            热爱游戏引擎底层技术，专注于DirectX 11渲染技术和PhysX物理模拟。
-            在这里分享C++游戏引擎开发经验、HLSL着色器编程和物理引擎集成心得。
-          </motion.p>
-
-          {/* Contact Info */}
-          <div className={`flex justify-center items-center space-x-8 text-gray-500 light:text-gray-700 mb-12 ${isVisible ? 'animate-fade-in-up animate-delay-500' : 'opacity-0'}`}>
-            <div className="group flex items-center space-x-2 hover:text-white light:hover:text-gray-900 transition-all duration-300 cursor-pointer">
-              <div className="p-2 bg-gray-800 light:bg-gray-200 rounded-full group-hover:bg-gray-700 light:group-hover:bg-gray-300 transition-colors duration-300">
-                <MapPin size={18} />
-              </div>
-              <span className="font-medium">中国</span>
-            </div>
-            <div className="group flex items-center space-x-2 hover:text-white light:hover:text-gray-900 transition-all duration-300 cursor-pointer">
-              <div className="p-2 bg-gray-800 light:bg-gray-200 rounded-full group-hover:bg-gray-700 light:group-hover:bg-gray-300 transition-colors duration-300">
-                <Mail size={18} />
-              </div>
-              <span className="font-medium">联系邮箱</span>
-            </div>
-            <div className="group flex items-center space-x-2 hover:text-white light:hover:text-gray-900 transition-all duration-300 cursor-pointer">
-              <div className="p-2 bg-gray-800 light:bg-gray-200 rounded-full group-hover:bg-gray-700 light:group-hover:bg-gray-300 transition-colors duration-300">
-                <Github size={18} />
-              </div>
-              <span className="font-medium">GitHub</span>
-            </div>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className={`flex flex-col sm:flex-row justify-center gap-4 ${isVisible ? 'animate-fade-in-up animate-delay-600' : 'opacity-0'}`}>
-            <a
-              href="/blog"
-              className="btn btn-gradient btn-lg group"
-            >
-              <span>查看博客</span>
-              <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </a>
-            <a
-              href="/about"
-              className="btn btn-secondary btn-lg group"
-            >
-              <span>了解更多</span>
-              <svg className="w-5 h-5 transform group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </a>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className={`mt-16 ${isVisible ? 'animate-fade-in-up animate-delay-700' : 'opacity-0'}`}>
-            <div className="flex flex-col items-center text-gray-400 light:text-gray-600">
-              <span className="text-sm font-medium mb-2">向下滚动探索更多</span>
-              <div className="w-6 h-10 border-2 border-white/30 light:border-black/20 rounded-full flex justify-center">
-                <div className="w-1 h-3 bg-white/60 light:bg-black/40 rounded-full mt-2 animate-bounce"></div>
-              </div>
-            </div>
-          </div>
         </div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        >
+          <div className="flex flex-col items-center text-gray-400">
+            <span className="text-sm mb-2">探索更多</span>
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center"
+            >
+              <div className="w-1 h-3 bg-gray-400 rounded-full mt-2" />
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
-    </section>
+    </Section>
   )
 }
 

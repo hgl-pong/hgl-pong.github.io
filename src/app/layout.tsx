@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import MouseFollower from '@/components/MouseFollower'
+import CursorGlow from '@/components/CursorGlow'
 
 export const metadata: Metadata = {
   title: 'HGL博客 - DirectX与PhysX游戏引擎开发',
@@ -21,8 +21,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body>
-        <MouseFollower />
+      <body className="cursor-none">
+        <CursorGlow />
         <div className="min-h-screen">
           {children}
         </div>

@@ -183,7 +183,8 @@ public:
                 <h3>创建刚体</h3>
                 <p>PhysX中的刚体分为静态刚体和动态刚体：</p>
 
-                <pre><code>{`// 创建静态刚体（地面）
+                <CodeBlock
+                  code={`// 创建静态刚体（地面）
 physx::PxRigidStatic* CreateStaticBox(const physx::PxVec3& position, 
                                       const physx::PxVec3& dimensions) {
     physx::PxTransform transform(position);
@@ -236,12 +237,17 @@ physx::PxRigidDynamic* CreateDynamicSphere(const physx::PxVec3& position,
     
     m_scene->addActor(*dynamicActor);
     return dynamicActor;
-}`}</code></pre>
+}`}
+                  language="cpp"
+                  title="创建刚体"
+                  showLineNumbers={true}
+                />
 
                 <h3>物理模拟更新</h3>
                 <p>在游戏主循环中更新物理模拟：</p>
 
-                <pre><code>{`class PhysicsEngine {
+                <CodeBlock
+                  code={`class PhysicsEngine {
 private:
     float m_accumulator = 0.0f;
     float m_stepSize = 1.0f / 60.0f;  // 60 FPS
@@ -273,12 +279,17 @@ public:
         
         return rotationMatrix * translationMatrix;
     }
-};`}</code></pre>
+};`}
+                  language="cpp"
+                  title="物理模拟更新"
+                  showLineNumbers={true}
+                />
 
                 <h3>碰撞检测</h3>
                 <p>PhysX提供了强大的碰撞检测功能：</p>
 
-                <pre><code>{`// 碰撞回调类
+                <CodeBlock
+                  code={`// 碰撞回调类
 class CollisionCallback : public physx::PxSimulationEventCallback {
 public:
     void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) override {}
@@ -319,12 +330,17 @@ private:
 
 // 在场景创建时设置回调
 CollisionCallback* collisionCallback = new CollisionCallback();
-m_scene->setSimulationEventCallback(collisionCallback);`}</code></pre>
+m_scene->setSimulationEventCallback(collisionCallback);`}
+                  language="cpp"
+                  title="碰撞检测"
+                  showLineNumbers={true}
+                />
 
                 <h3>射线检测</h3>
                 <p>射线检测在游戏中非常有用，比如鼠标拾取、武器射击等：</p>
 
-                <pre><code>{`// 射线检测
+                <CodeBlock
+                  code={`// 射线检测
 bool Raycast(const physx::PxVec3& origin, 
              const physx::PxVec3& direction, 
              float maxDistance,
@@ -350,7 +366,11 @@ if (Raycast(rayOrigin, rayDirection, 20.0f, hit)) {
     std::cout << "Hit position: " << hit.position.x << ", " 
               << hit.position.y << ", " << hit.position.z << std::endl;
     std::cout << "Hit distance: " << hit.distance << std::endl;
-}`}</code></pre>
+}`}
+                  language="cpp"
+                  title="射线检测"
+                  showLineNumbers={true}
+                />
 
                 <h3>性能优化建议</h3>
                 <p>在使用PhysX时，需要注意以下性能优化点：</p>
@@ -364,7 +384,8 @@ if (Raycast(rayOrigin, rayDirection, 20.0f, hit)) {
                 <h4>3. 合理管理活跃对象</h4>
                 <p>让不需要模拟的对象进入睡眠状态，减少计算负担。</p>
 
-                <pre><code>{`// 设置睡眠阈值
+                <CodeBlock
+                  code={`// 设置睡眠阈值
 dynamicActor->setSleepThreshold(0.5f);
 dynamicActor->setStabilizationThreshold(0.1f);
 
@@ -372,12 +393,17 @@ dynamicActor->setStabilizationThreshold(0.1f);
 dynamicActor->putToSleep();
 
 // 唤醒对象
-dynamicActor->wakeUp();`}</code></pre>
+dynamicActor->wakeUp();`}
+                  language="cpp"
+                  title="性能优化 - 睡眠管理"
+                  showLineNumbers={true}
+                />
 
                 <h3>与渲染系统的集成</h3>
                 <p>物理引擎需要与渲染系统紧密配合：</p>
 
-                <pre><code>{`class GameObject {
+                <CodeBlock
+                  code={`class GameObject {
 private:
     physx::PxRigidActor* m_physicsActor;
     // 渲染相关数据
@@ -399,7 +425,11 @@ public:
         // 使用更新后的变换矩阵进行渲染
         // ...
     }
-};`}</code></pre>
+};`}
+                  language="cpp"
+                  title="与渲染系统集成"
+                  showLineNumbers={true}
+                />
 
                 <h3>总结</h3>
                 <p>

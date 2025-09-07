@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { ChevronUp } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const ScrollToTop = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -27,21 +28,22 @@ const ScrollToTop = () => {
   }
 
   return (
-    <button
-      onClick={scrollToTop}
-      className={`
-        fixed bottom-8 right-8 z-50 p-3 rounded-full
-        bg-white/10 text-white shadow-lg hover:bg-white/20 border border-white/20
-        transition-all duration-300 hover:scale-110 hover-glow
-        ${isVisible 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-4 pointer-events-none'
-        }
-      `}
-      aria-label="Scroll to top"
-    >
-      <ChevronUp size={24} className="animate-bounce" />
-    </button>
+    <AnimatePresence>
+      {isVisible && (
+        <motion.button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 p-4 bg-white border border-gray-200 text-gray-700 shadow-lg hover:shadow-xl rounded-xl transition-all duration-300 hover:bg-gray-50 hover:border-gray-300"
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 20 }}
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          aria-label="Scroll to top"
+        >
+          <ChevronUp size={20} />
+        </motion.button>
+      )}
+    </AnimatePresence>
   )
 }
 

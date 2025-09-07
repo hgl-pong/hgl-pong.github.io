@@ -1,6 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { Code2, Zap, Gamepad2, Settings } from 'lucide-react'
+import Section from './ui/Section'
+import Typography from './ui/Typography'
+import Card from './ui/Card'
+import ProfessionalBackground from './ui/ProfessionalBackground'
 
 const TechStack = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -11,7 +17,6 @@ const TechStack = () => {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true)
-          // Delay skill bar animations
           setTimeout(() => setAnimateSkills(true), 500)
         }
       },
@@ -23,174 +28,184 @@ const TechStack = () => {
 
     return () => observer.disconnect()
   }, [])
+
   const techStacks = [
-    { name: 'C++', level: 95, color: 'bg-gray-300' },
-    { name: 'DirectX 11', level: 90, color: 'bg-gray-400' },
-    { name: 'PhysX', level: 85, color: 'bg-gray-500' },
-    { name: 'HLSL', level: 88, color: 'bg-gray-600' },
-    { name: 'Win32 API', level: 80, color: 'bg-gray-500' },
-    { name: '自研引擎', level: 85, color: 'bg-gray-400' },
-    { name: '3D数学', level: 90, color: 'bg-gray-300' },
-    { name: 'Visual Studio', level: 85, color: 'bg-gray-600' },
+    { name: 'C++', level: 95, category: '编程语言', years: '8+' },
+    { name: 'DirectX 11', level: 90, category: '图形API', years: '5+' },
+    { name: 'PhysX', level: 85, category: '物理引擎', years: '4+' },
+    { name: 'HLSL', level: 88, category: '着色器', years: '5+' },
+    { name: 'Win32 API', level: 80, category: '系统API', years: '6+' },
+    { name: '游戏引擎架构', level: 85, category: '架构设计', years: '4+' },
   ]
 
   const categories = [
     {
-      title: '图形编程',
-      techs: ['DirectX 11', 'HLSL', 'Shader编程', '渲染管线'],
-      icon: '🎨'
+      title: '图形渲染技术',
+      description: '专注于现代图形API和渲染管线优化',
+      icon: <Code2 size={24} />,
+      techs: ['DirectX 11', 'HLSL Shaders', '渲染管线', 'GPU优化'],
+      color: 'blue',
+      projects: 15
     },
     {
-      title: '物理引擎',
-      techs: ['PhysX', '碰撞检测', '刚体动力学', '约束系统'],
-      icon: '⚡'
+      title: '物理引擎开发',
+      description: '深入研究物理模拟和碰撞检测系统',
+      icon: <Zap size={24} />,
+      techs: ['PhysX SDK', '碰撞检测', '刚体动力学', '约束系统'],
+      color: 'teal',
+      projects: 12
     },
     {
-      title: '引擎开发',
-      techs: ['C++', '自研引擎', '资源管理', '性能优化'],
-      icon: '🎮'
+      title: '引擎架构设计',
+      description: '构建高性能、可扩展的游戏引擎架构',
+      icon: <Gamepad2 size={24} />,
+      techs: ['C++架构', '内存管理', '多线程', '性能优化'],
+      color: 'purple',
+      projects: 8
     }
   ]
 
+
   return (
-    <section id="tech-stack" className="py-24 relative overflow-hidden">
-      {/* Modern Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black opacity-0"></div>
-
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-white/5 to-white/10 rounded-full blur-xl animate-float"></div>
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-gradient-to-br from-white/10 to-white/5 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-white/10 to-white/5 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }}></div>
-      </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <Section id="tech-stack" variant="professional" padding="xl" className="relative">
+      <ProfessionalBackground variant="gradient" />
+      
+      <div className="relative z-10">
         {/* Section Header */}
-        <div className={`text-center mb-16 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-gray-700 to-gray-900 rounded-2xl mb-6">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-            </svg>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-300 light:from-gray-900 light:via-gray-700 light:to-gray-800 bg-clip-text text-transparent mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-6">
+            <Settings size={16} />
             技术栈
-          </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            我熟悉的游戏引擎开发技术和工具，专注于高性能图形渲染和物理模拟
-          </p>
-          <div className="mt-6 w-24 h-1 bg-gradient-to-r from-gray-700 to-gray-900 rounded-full mx-auto"></div>
-        </div>
+          </div>
+          
+          <Typography variant="h2" color="professional" className="mb-6">
+            核心技术能力
+          </Typography>
+          
+          <Typography variant="body" color="secondary" className="text-lg max-w-3xl mx-auto">
+            专注于游戏引擎底层技术开发，在图形渲染、物理模拟和引擎架构方面拥有丰富经验
+          </Typography>
+        </motion.div>
+
 
         {/* Tech Categories */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="grid lg:grid-cols-3 gap-8 mb-16">
           {categories.map((category, index) => (
-            <div
+            <motion.div
               key={category.title}
-              className={`
-                group relative overflow-hidden bg-black/40 backdrop-blur-sm border border-white/10 glass-highlight glass-noise
-                rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500
-                hover:transform hover:-translate-y-2 text-center
-                ${isVisible ? `animate-fade-in-up animate-delay-${(index + 1) * 200}` : 'opacity-0'}
-              `}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.4 + index * 0.2 }}
             >
-              {/* Icon with gradient background */}
-              <div className="relative mb-6">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-700 to-gray-900 rounded-2xl text-white text-3xl shadow-lg group-hover:scale-110 transition-transform duration-300 animate-float" style={{ animationDelay: `${index * 0.5}s` }}>
-                  {category.icon}
+              <Card variant="professional" padding="lg" hover className="h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-12 h-12 bg-${category.color}-100 rounded-xl flex items-center justify-center text-${category.color}-600`}>
+                    {category.icon}
+                  </div>
+                  <div className="flex-1">
+                    <Typography variant="h5" color="professional">
+                      {category.title}
+                    </Typography>
+                    <Typography variant="caption" color="muted">
+                      {category.projects} 个相关项目
+                    </Typography>
+                  </div>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-400/20 to-white/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-
-              <h3 className="text-2xl font-bold text-gray-100 mb-6 group-hover:text-gray-300 transition-colors duration-300">
-                {category.title}
-                <div className="w-0 group-hover:w-full h-0.5 bg-gradient-to-r from-gray-700 to-gray-900 transition-all duration-500 mt-2 mx-auto"></div>
-              </h3>
-
-              <div className="flex flex-wrap justify-center gap-3">
-                {category.techs.map((tech, techIndex) => (
-                  <span
-                    key={tech}
-                    className="inline-flex items-center px-4 py-2 bg-white/10 border border-white/20 text-gray-200 text-sm font-semibold rounded-full hover:bg-white/20 hover:scale-105 transition-all duration-300 cursor-pointer"
-                  >
-                    <span className="w-1.5 h-1.5 mr-2 rounded-full bg-white/70 border border-white/30"></span>
-                    {tech}
-                  </span>
-                ))}
-              </div>
-
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-500/5 via-white/5 to-gray-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
-            </div>
+                
+                <Typography variant="body" color="secondary" className="mb-6">
+                  {category.description}
+                </Typography>
+                
+                <div className="space-y-2">
+                  {category.techs.map((tech) => (
+                    <div
+                      key={tech}
+                      className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg text-sm"
+                    >
+                      <div className={`w-2 h-2 bg-${category.color}-500 rounded-full`} />
+                      <span className="font-medium text-gray-700">{tech}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
-        {/* Skill Levels */}
-        <div className={`relative overflow-hidden bg-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-10 shadow-lg hover:shadow-2xl transition-all duration-500 ${isVisible ? 'animate-fade-in-up animate-delay-600' : 'opacity-0'}`}>
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-gray-700 to-gray-900 rounded-2xl mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
+        {/* Skills Progress */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 1 }}
+        >
+          <Card variant="professional" padding="lg">
+            <div className="text-center mb-8">
+              <Typography variant="h3" color="professional" className="mb-4">
+                技能熟练度
+              </Typography>
+              <Typography variant="body" color="secondary">
+                基于实际项目经验和技术实践
+              </Typography>
             </div>
-            <h3 className="text-3xl font-bold text-white mb-4">
-              技能熟练度
-            </h3>
-            <p className="text-gray-400">
-              基于项目经验和实际应用的技能评估
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {techStacks.map((tech, index) => (
-              <div
-                key={tech.name}
-                className={`
-                  group p-6 bg-white/5 rounded-2xl border border-white/10 glass-highlight glass-noise hover:border-white/20 hover:shadow-lg transition-all duration-300
-                  ${animateSkills ? `animate-fade-in-left animate-delay-${index * 100}` : 'opacity-0'}
-                `}
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-bold text-gray-100 group-hover:text-gray-300 transition-colors duration-300">
-                    {tech.name}
-                  </span>
-                  <span className="text-sm font-bold text-gray-200 bg-white/10 px-3 py-1 rounded-full group-hover:bg-white/20 group-hover:text-white transition-all duration-300">
-                    {tech.level}%
-                  </span>
-                </div>
-
-                <div className="relative">
-                  <div className="w-full bg-white/10 rounded-full h-4 overflow-hidden shadow-inner">
-                    <div
-                      className={`h-4 rounded-full ${tech.color} transition-all duration-1000 ease-out relative overflow-hidden`}
-                      style={{
-                        width: animateSkills ? `${tech.level}%` : '0%',
-                        transitionDelay: `${index * 150}ms`
-                      }}
-                    >
-                      {/* Animated shine effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 animate-pulse"></div>
-
-                      {/* Skill level indicator */}
-                      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-sm opacity-80"></div>
+            <div className="grid md:grid-cols-2 gap-8">
+              {techStacks.map((tech, index) => (
+                <motion.div
+                  key={tech.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={animateSkills ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="space-y-3"
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <Typography variant="h6" color="professional">
+                        {tech.name}
+                      </Typography>
+                      <Typography variant="caption" color="muted">
+                        {tech.category} • {tech.years} 年经验
+                      </Typography>
+                    </div>
+                    <div className="text-right">
+                      <Typography variant="h6" color="accent" className="font-bold">
+                        {tech.level}%
+                      </Typography>
                     </div>
                   </div>
-
-                  {/* Skill level labels */}
-                  <div className="flex justify-between text-xs text-gray-500 mt-2">
-                    <span>初学</span>
-                    <span>熟练</span>
-                    <span>精通</span>
+                  
+                  <div className="relative">
+                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <motion.div
+                        className="h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full relative overflow-hidden"
+                        initial={{ width: 0 }}
+                        animate={animateSkills ? { width: `${tech.level}%` } : {}}
+                        transition={{ duration: 1, delay: index * 0.15, ease: "easeOut" }}
+                      >
+                        {/* Shimmer effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 animate-pulse" />
+                      </motion.div>
+                    </div>
+                    
+                    {/* Skill level indicators */}
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>初学</span>
+                      <span>熟练</span>
+                      <span>精通</span>
+                      <span>精通</span>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Background decoration */}
-          <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-gray-400/10 to-white/10 rounded-full blur-2xl"></div>
-        </div>
+                </motion.div>
+              ))}
+            </div>
+          </Card>
+        </motion.div>
       </div>
-    </section>
+    </Section>
   )
 }
 

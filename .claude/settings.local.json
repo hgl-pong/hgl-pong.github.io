@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install tailwind-merge)",
+      "Bash(npm run build)",
+      "Bash(npm run export)",
+      "Bash(npm run dev)",
+      "Bash(npm install prismjs)",
+      "Bash(npm install --save-dev @types/prismjs)",
+      "Bash(npx next build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run lint)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
