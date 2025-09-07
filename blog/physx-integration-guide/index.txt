@@ -1,202 +1,187 @@
-1:HL["/_next/static/css/550b45f64338b8c5.css","style",{"crossOrigin":""}]
-0:["BWVUQzHWD8YVyutkGjmz2",[[["",{"children":["blog",{"children":["physx-integration-guide",{"children":["__PAGE__",{}]}]}]},"$undefined","$undefined",true],"$L2",[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/550b45f64338b8c5.css","precedence":"next","crossOrigin":""}]],"$L3"]]]]
-4:I[56954,[],""]
-5:I[7264,[],""]
-7:I[75846,["6350","static/chunks/6350-aea68fce315c2bca.js","7709","static/chunks/7709-78b0f713bc86efcc.js","8752","static/chunks/app/blog/physx-integration-guide/page-a76af839ec8b0ac2.js"],""]
-8:I[68326,["6350","static/chunks/6350-aea68fce315c2bca.js","7709","static/chunks/7709-78b0f713bc86efcc.js","8752","static/chunks/app/blog/physx-integration-guide/page-a76af839ec8b0ac2.js"],""]
-9:I[27674,["6350","static/chunks/6350-aea68fce315c2bca.js","7709","static/chunks/7709-78b0f713bc86efcc.js","8752","static/chunks/app/blog/physx-integration-guide/page-a76af839ec8b0ac2.js"],""]
-a:T766,#include <PxPhysicsAPI.h>
-
-class PhysicsEngine {
-private:
-    physx::PxDefaultAllocator m_allocator;
-    physx::PxDefaultErrorCallback m_errorCallback;
-    physx::PxFoundation* m_foundation;
-    physx::PxPhysics* m_physics;
-    physx::PxDefaultCpuDispatcher* m_dispatcher;
-    physx::PxScene* m_scene;
-    physx::PxMaterial* m_material;
-
-public:
-    bool Initialize() {
-        // 创建Foundation
-        m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION,
-                                        m_allocator, m_errorCallback);
-        if (!m_foundation) {
-            return false;
-        }
-
-        // 创建Physics对象
-        m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation,
-                                   physx::PxTolerancesScale(), true);
-        if (!m_physics) {
-            return false;
-        }
-
-        // 创建场景描述
-        physx::PxSceneDesc sceneDesc(m_physics->getTolerancesScale());
-        sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
-
-        m_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
-        sceneDesc.cpuDispatcher = m_dispatcher;
-        sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-
-        // 创建场景
-        m_scene = m_physics->createScene(sceneDesc);
-        if (!m_scene) {
-            return false;
-        }
-
-        // 创建默认材质
-        m_material = m_physics->createMaterial(0.5f, 0.5f, 0.6f);
-
-        return true;
-    }
-
-    void Cleanup() {
-        if (m_scene) {
-            m_scene->release();
-            m_scene = nullptr;
-        }
-        if (m_dispatcher) {
-            m_dispatcher->release();
-            m_dispatcher = nullptr;
-        }
-        if (m_physics) {
-            m_physics->release();
-            m_physics = nullptr;
-        }
-        if (m_foundation) {
-            m_foundation->release();
-            m_foundation = nullptr;
-        }
-    }
-};b:T78b,// 创建静态刚体（地面）
-physx::PxRigidStatic* CreateStaticBox(const physx::PxVec3& position, 
-                                      const physx::PxVec3& dimensions) {
-    physx::PxTransform transform(position);
-    physx::PxRigidStatic* staticActor = m_physics->createRigidStatic(transform);
-    
-    physx::PxShape* shape = physx::PxRigidActorExt::createExclusiveShape(
-        *staticActor, 
-        physx::PxBoxGeometry(dimensions), 
-        *m_material
-    );
-    
-    m_scene->addActor(*staticActor);
-    return staticActor;
-}
-
-// 创建动态刚体（可移动物体）
-physx::PxRigidDynamic* CreateDynamicBox(const physx::PxVec3& position, 
-                                       const physx::PxVec3& dimensions, 
-                                       float density = 1.0f) {
-    physx::PxTransform transform(position);
-    physx::PxRigidDynamic* dynamicActor = m_physics->createRigidDynamic(transform);
-    
-    physx::PxShape* shape = physx::PxRigidActorExt::createExclusiveShape(
-        *dynamicActor, 
-        physx::PxBoxGeometry(dimensions), 
-        *m_material
-    );
-    
-    // 设置质量属性
-    physx::PxRigidBodyExt::updateMassAndInertia(*dynamicActor, density);
-    
-    m_scene->addActor(*dynamicActor);
-    return dynamicActor;
-}
-
-// 创建球体
-physx::PxRigidDynamic* CreateDynamicSphere(const physx::PxVec3& position, 
-                                          float radius, 
-                                          float density = 1.0f) {
-    physx::PxTransform transform(position);
-    physx::PxRigidDynamic* dynamicActor = m_physics->createRigidDynamic(transform);
-    
-    physx::PxShape* shape = physx::PxRigidActorExt::createExclusiveShape(
-        *dynamicActor, 
-        physx::PxSphereGeometry(radius), 
-        *m_material
-    );
-    
-    physx::PxRigidBodyExt::updateMassAndInertia(*dynamicActor, density);
-    
-    m_scene->addActor(*dynamicActor);
-    return dynamicActor;
-}c:T482,class PhysicsEngine {
-private:
-    float m_accumulator = 0.0f;
-    float m_stepSize = 1.0f / 60.0f;  // 60 FPS
-
-public:
-    void Update(float deltaTime) {
-        m_accumulator += deltaTime;
-        
-        // 固定时间步长更新
-        while (m_accumulator >= m_stepSize) {
-            m_scene->simulate(m_stepSize);
-            m_scene->fetchResults(true);
-            m_accumulator -= m_stepSize;
-        }
-    }
-    
-    // 获取刚体变换矩阵
-    DirectX::XMMATRIX GetActorTransform(physx::PxRigidActor* actor) {
-        physx::PxTransform transform = actor->getGlobalPose();
-        
-        // 转换为DirectX矩阵
-        DirectX::XMVECTOR position = DirectX::XMVectorSet(
-            transform.p.x, transform.p.y, transform.p.z, 1.0f);
-        DirectX::XMVECTOR rotation = DirectX::XMVectorSet(
-            transform.q.x, transform.q.y, transform.q.z, transform.q.w);
-        
-        DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslationFromVector(position);
-        DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationQuaternion(rotation);
-        
-        return rotationMatrix * translationMatrix;
-    }
-};d:T712,// 碰撞回调类
-class CollisionCallback : public physx::PxSimulationEventCallback {
-public:
-    void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) override {}
-    void onWake(physx::PxActor** actors, physx::PxU32 count) override {}
-    void onSleep(physx::PxActor** actors, physx::PxU32 count) override {}
-    void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) override {}
-    void onAdvance(const physx::PxRigidBody*const* bodyBuffer, const physx::PxTransform* poseBuffer, const physx::PxU32 count) override {}
-    
-    void onContact(const physx::PxContactPairHeader& pairHeader, 
-                   const physx::PxContactPair* pairs, 
-                   physx::PxU32 nbPairs) override {
-        for (physx::PxU32 i = 0; i < nbPairs; i++) {
-            const physx::PxContactPair& cp = pairs[i];
-            
-            if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-                // 碰撞开始
-                OnCollisionEnter(pairHeader.actors[0], pairHeader.actors[1]);
-            }
-            
-            if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-                // 碰撞结束
-                OnCollisionExit(pairHeader.actors[0], pairHeader.actors[1]);
-            }
-        }
-    }
-    
-private:
-    void OnCollisionEnter(physx::PxRigidActor* actor1, physx::PxRigidActor* actor2) {
-        // 处理碰撞开始事件
-        std::cout << "Collision Enter!" << std::endl;
-    }
-    
-    void OnCollisionExit(physx::PxRigidActor* actor1, physx::PxRigidActor* actor2) {
-        // 处理碰撞结束事件
-        std::cout << "Collision Exit!" << std::endl;
-    }
+1:HL["/_next/static/css/764c5b44fcd35701.css","style",{"crossOrigin":""}]
+0:["8N3pHZZrDRdvwbm2TIZ4i",[[["",{"children":["blog",{"children":[["slug","physx-integration-guide","d"],{"children":["__PAGE__?{\"slug\":\"physx-integration-guide\"}",{}]}]}]},"$undefined","$undefined",true],"$L2",[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/764c5b44fcd35701.css","precedence":"next","crossOrigin":""}]],"$L3"]]]]
+4:I[3108,["187","static/chunks/187-2b453017649f79a9.js","185","static/chunks/app/layout-35d4c2d1421a0087.js"],""]
+5:I[6954,[],""]
+6:I[7264,[],""]
+8:I[2446,["187","static/chunks/187-2b453017649f79a9.js","940","static/chunks/940-a00d8960f47eca25.js","619","static/chunks/619-c6af3a1b7c4972d6.js","308","static/chunks/app/blog/%5Bslug%5D/page-9fbe7a295be62d0d.js"],""]
+9:I[5846,["187","static/chunks/187-2b453017649f79a9.js","940","static/chunks/940-a00d8960f47eca25.js","619","static/chunks/619-c6af3a1b7c4972d6.js","308","static/chunks/app/blog/%5Bslug%5D/page-9fbe7a295be62d0d.js"],""]
+a:I[8995,["187","static/chunks/187-2b453017649f79a9.js","940","static/chunks/940-a00d8960f47eca25.js","619","static/chunks/619-c6af3a1b7c4972d6.js","308","static/chunks/app/blog/%5Bslug%5D/page-9fbe7a295be62d0d.js"],""]
+b:I[6634,["187","static/chunks/187-2b453017649f79a9.js","940","static/chunks/940-a00d8960f47eca25.js","619","static/chunks/619-c6af3a1b7c4972d6.js","308","static/chunks/app/blog/%5Bslug%5D/page-9fbe7a295be62d0d.js"],""]
+c:I[6995,["187","static/chunks/187-2b453017649f79a9.js","940","static/chunks/940-a00d8960f47eca25.js","619","static/chunks/619-c6af3a1b7c4972d6.js","308","static/chunks/app/blog/%5Bslug%5D/page-9fbe7a295be62d0d.js"],""]
+2a:I[7561,["187","static/chunks/187-2b453017649f79a9.js","940","static/chunks/940-a00d8960f47eca25.js","619","static/chunks/619-c6af3a1b7c4972d6.js","308","static/chunks/app/blog/%5Bslug%5D/page-9fbe7a295be62d0d.js"],""]
+2b:I[5824,["187","static/chunks/187-2b453017649f79a9.js","940","static/chunks/940-a00d8960f47eca25.js","619","static/chunks/619-c6af3a1b7c4972d6.js","308","static/chunks/app/blog/%5Bslug%5D/page-9fbe7a295be62d0d.js"],""]
+65:I[9937,["187","static/chunks/187-2b453017649f79a9.js","940","static/chunks/940-a00d8960f47eca25.js","619","static/chunks/619-c6af3a1b7c4972d6.js","308","static/chunks/app/blog/%5Bslug%5D/page-9fbe7a295be62d0d.js"],""]
+66:I[9585,["187","static/chunks/187-2b453017649f79a9.js","940","static/chunks/940-a00d8960f47eca25.js","619","static/chunks/619-c6af3a1b7c4972d6.js","308","static/chunks/app/blog/%5Bslug%5D/page-9fbe7a295be62d0d.js"],""]
+e:["PhysX","物理引擎","碰撞检测"]
+10:{"type":"heading","level":2,"id":"intro","text":"PhysX物理引擎简介"}
+11:{"type":"paragraph","text":"PhysX是NVIDIA开发的实时物理引擎，广泛应用于游戏开发中。它提供了刚体动力学、软体模拟、流体模拟、布料模拟等丰富的物理效果。本文将详细介绍如何在自研游戏引擎中集成PhysX。"}
+12:{"type":"heading","level":3,"id":"setup","text":"环境配置"}
+13:{"type":"paragraph","text":"首先需要下载并配置PhysX SDK："}
+15:["从NVIDIA官网下载PhysX SDK","解压到项目目录","配置Visual Studio项目设置"]
+14:{"type":"list","ordered":true,"items":"$15"}
+16:{"type":"code","language":"cpp","code":"// 项目配置示例\n// 包含目录\n$(PhysXSDK)/Include\n$(PhysXSDK)/Include/common\n$(PhysXSDK)/Include/geometry\n$(PhysXSDK)/Include/foundation\n\n// 库目录\n$(PhysXSDK)/Lib/$(Platform)/$(Configuration)\n\n// 链接库\nPhysX_64.lib\nPhysXCommon_64.lib\nPhysXFoundation_64.lib\nPhysXCooking_64.lib"}
+17:{"type":"heading","level":3,"id":"init","text":"初始化PhysX"}
+18:{"type":"paragraph","text":"PhysX的初始化包括创建基金会、物理系统、场景等核心组件："}
+19:{"type":"code","language":"cpp","code":"// PhysX初始化代码\n#include <PxPhysicsAPI.h>\n\nusing namespace physx;\n\nclass PhysicsManager {\nprivate:\n    PxFoundation* foundation;\n    PxPhysics* physics;\n    PxScene* scene;\n    PxDefaultAllocator allocator;\n    PxDefaultErrorCallback errorCallback;\n    \npublic:\n    bool Initialize() {\n        // 创建基金会\n        foundation = PxCreateFoundation(PX_PHYSICS_VERSION, allocator, errorCallback);\n        if (!foundation) return false;\n        \n        // 创建物理系统\n        physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, PxTolerancesScale());\n        if (!physics) return false;\n        \n        // 创建场景描述\n        PxSceneDesc sceneDesc(physics->getTolerancesScale());\n        sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);\n        sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(2);\n        sceneDesc.filterShader = PxDefaultSimulationFilterShader;\n        \n        // 创建场景\n        scene = physics->createScene(sceneDesc);\n        if (!scene) return false;\n        \n        return true;\n    }\n};"}
+1a:{"type":"heading","level":3,"id":"rigidbody","text":"刚体物理"}
+1b:{"type":"paragraph","text":"刚体是物理引擎中最基本的概念，它具有质量、速度、加速度等物理属性："}
+1c:{"type":"code","language":"cpp","code":"// 创建刚体\nPxRigidDynamic* CreateDynamicBox(const PxVec3& position, const PxVec3& halfSize, float density) {\n    // 创建形状\n    PxShape* shape = physics->createShape(PxBoxGeometry(halfSize), *material);\n    \n    // 创建刚体\n    PxTransform transform(position);\n    PxRigidDynamic* body = physics->createRigidDynamic(transform);\n    body->attachShape(*shape);\n    \n    // 计算质量和惯性\n    PxRigidBodyExt::updateMassAndInertia(*body, density);\n    \n    // 添加到场景\n    scene->addActor(*body);\n    \n    return body;\n}\n\n// 创建静态物体\nPxRigidStatic* CreateStaticBox(const PxVec3& position, const PxVec3& halfSize) {\n    // 创建形状\n    PxShape* shape = physics->createShape(PxBoxGeometry(halfSize), *material);\n    \n    // 创建静态物体\n    PxTransform transform(position);\n    PxRigidStatic* body = physics->createRigidStatic(transform);\n    body->attachShape(*shape);\n    \n    // 添加到场景\n    scene->addActor(*body);\n    \n    return body;\n}"}
+1d:{"type":"heading","level":3,"id":"collision","text":"碰撞检测"}
+1e:{"type":"paragraph","text":"PhysX提供了强大的碰撞检测系统，包括碰撞形状、过滤器和碰撞回调："}
+1f:{"type":"code","language":"cpp","code":"// 碰撞回调类\nclass CollisionCallback : public PxSimulationEventCallback {\npublic:\n    void onContact(const PxContactPairHeader& pairHeader, \n                   const PxContactPair* pairs, PxU32 nbPairs) override {\n        for (PxU32 i = 0; i < nbPairs; i++) {\n            const PxContactPair& cp = pairs[i];\n            \n            // 检查碰撞开始\n            if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND) {\n                std::cout << \"Collision detected!\" << std::endl;\n            }\n            \n            // 检查碰撞结束\n            if (cp.events & PxPairFlag::eNOTIFY_TOUCH_LOST) {\n                std::cout << \"Collision ended!\" << std::endl;\n            }\n        }\n    }\n    \n    // 其他回调函数...\n};\n\n// 设置碰撞过滤\nvoid SetupCollisionFiltering() {\n    PxFilterData filterData;\n    filterData.word0 = 0x1; // 类别1\n    filterData.word1 = 0x2; // 与类别2碰撞\n    \n    PxShape* shape = ...;\n    shape->setSimulationFilterData(filterData);\n}"}
+20:{"type":"heading","level":3,"id":"optimization","text":"性能优化"}
+21:{"type":"paragraph","text":"PhysX物理引擎的性能优化是游戏开发中的重要环节："}
+23:["**批处理** - 减少物理模拟的调用次数","**LOD系统** - 根据距离调整物理精度","**睡眠机制** - 静止物体进入睡眠状态","**区域划分** - 使用空间分区优化碰撞检测","**多线程** - 利用多核CPU进行并行计算"]
+22:{"type":"list","items":"$23"}
+24:{"type":"code","language":"cpp","code":"// 性能优化设置\nvoid OptimizePhysicsScene() {\n    // 设置时间步长\n    scene->setGravity(PxVec3(0.0f, -9.81f, 0.0f));\n    \n    // 启用睡眠机制\n    scene->setFlag(PxSceneFlag::eENABLE_CCD, true);\n    scene->setFlag(PxSceneFlag::eENABLE_ACTIVE_ACTORS, true);\n    \n    // 设置求解器迭代次数\n    scene->setSolverBatchSize(PxU32(50));\n    scene->setSolverIterationCount(4);\n    \n    // 启用连续碰撞检测\n    PxSetWarnOnDeprecatedAPI(true);\n}\n\n// 批处理物理更新\nvoid UpdatePhysics(float deltaTime) {\n    // 固定时间步长\n    const float fixedTimeStep = 1.0f / 60.0f;\n    accumulator += deltaTime;\n    \n    while (accumulator >= fixedTimeStep) {\n        scene->simulate(fixedTimeStep);\n        scene->fetchResults(true);\n        accumulator -= fixedTimeStep;\n    }\n}"}
+25:{"type":"heading","level":3,"id":"summary","text":"总结"}
+26:{"type":"paragraph","text":"PhysX物理引擎为游戏开发提供了强大而完整的物理模拟解决方案。通过合理的架构设计和性能优化，可以在游戏中实现逼真的物理效果。掌握PhysX的集成技术，是开发高质量3D游戏的重要技能。"}
+f:["$10","$11","$12","$13","$14","$16","$17","$18","$19","$1a","$1b","$1c","$1d","$1e","$1f","$20","$21","$22","$24","$25","$26"]
+28:{"title":"HLSL着色器编程技巧","slug":"hlsl-shader-programming"}
+29:{"title":"DirectX 11渲染管线深度解析","slug":"directx11-rendering-pipeline"}
+27:{"prev":"$28","next":"$29"}
+d:{"id":"physx-integration-guide","title":"PhysX物理引擎集成实战","subtitle":"PhysX Integration Guide","category":"PhysX","author":"HGL","date":"2024-01-10","readTime":"12分钟","excerpt":"从零开始集成PhysX物理引擎到游戏项目中，包括刚体物理、碰撞检测、约束系统等核心功能的实现和优化技巧...","tags":"$e","featured":false,"published":true,"content":"$f","navigation":"$27"}
+2c:T503,// 像素着色器示例
+struct PixelInput
+{
+    float4 position : SV_POSITION;
+    float3 worldPos : TEXCOORD0;
+    float3 normal : TEXCOORD1;
+    float2 texCoord : TEXCOORD2;
+    float4 color : COLOR;
 };
 
-// 在场景创建时设置回调
-CollisionCallback* collisionCallback = new CollisionCallback();
-m_scene->setSimulationEventCallback(collisionCallback);2:[null,["$","html",null,{"lang":"zh-CN","children":["$","body",null,{"children":["$","div",null,{"className":"min-h-screen","children":["$","$L4",null,{"parallelRouterKey":"children","segmentPath":["children"],"loading":"$undefined","loadingStyles":"$undefined","loadingScripts":"$undefined","hasLoading":false,"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L5",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":"404"}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],"notFoundStyles":[],"childProp":{"current":["$","$L4",null,{"parallelRouterKey":"children","segmentPath":["children","blog","children"],"loading":"$undefined","loadingStyles":"$undefined","loadingScripts":"$undefined","hasLoading":false,"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L5",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","notFoundStyles":"$undefined","childProp":{"current":["$","$L4",null,{"parallelRouterKey":"children","segmentPath":["children","blog","children","physx-integration-guide","children"],"loading":"$undefined","loadingStyles":"$undefined","loadingScripts":"$undefined","hasLoading":false,"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L5",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","notFoundStyles":"$undefined","childProp":{"current":["$L6",[["$","$L7",null,{}],["$","main",null,{"className":"min-h-screen","children":[["$","section",null,{"className":"bg-black/40 border-b border-white/10 py-12","children":["$","div",null,{"className":"max-w-4xl mx-auto px-4 sm:px-6 lg:px-8","children":[["$","div",null,{"className":"mb-8","children":["$","$L8",null,{"href":"/blog","className":"inline-flex items-center text-gray-200 hover:text-white transition-colors","children":[["$","svg",null,{"xmlns":"http://www.w3.org/2000/svg","width":20,"height":20,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"mr-2","children":[["$","path","1l729n",{"d":"m12 19-7-7 7-7"}],["$","path","x3x0zl",{"d":"M19 12H5"}],"$undefined"]}],"返回博客列表"]}]}],["$","div",null,{"className":"mb-4","children":["$","span",null,{"className":"inline-block bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm font-medium","children":"PhysX"}]}],["$","h1",null,{"className":"text-4xl font-bold text-white mb-6","children":"PhysX物理引擎集成实战"}],["$","div",null,{"className":"flex items-center space-x-6 text-gray-400 mb-8","children":[["$","div",null,{"className":"flex items-center space-x-2","children":[["$","svg",null,{"xmlns":"http://www.w3.org/2000/svg","width":18,"height":18,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-user","children":[["$","path","975kel",{"d":"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}],["$","circle","17ys0d",{"cx":"12","cy":"7","r":"4"}],"$undefined"]}],["$","span",null,{"children":"HGL"}]]}],["$","div",null,{"className":"flex items-center space-x-2","children":[["$","svg",null,{"xmlns":"http://www.w3.org/2000/svg","width":18,"height":18,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-calendar","children":[["$","rect","eu3xkr",{"width":"18","height":"18","x":"3","y":"4","rx":"2","ry":"2"}],["$","line","m3sa8f",{"x1":"16","x2":"16","y1":"2","y2":"6"}],["$","line","18kwsl",{"x1":"8","x2":"8","y1":"2","y2":"6"}],["$","line","xt86sb",{"x1":"3","x2":"21","y1":"10","y2":"10"}],"$undefined"]}],["$","span",null,{"children":"2024年1月10日"}]]}],["$","div",null,{"className":"flex items-center space-x-2","children":[["$","svg",null,{"xmlns":"http://www.w3.org/2000/svg","width":18,"height":18,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-clock","children":[["$","circle","1mglay",{"cx":"12","cy":"12","r":"10"}],["$","polyline","68esgv",{"points":"12 6 12 12 16 14"}],"$undefined"]}],["$","span",null,{"children":"12分钟阅读"}]]}]]}],["$","div",null,{"className":"flex items-center space-x-2","children":[["$","svg",null,{"xmlns":"http://www.w3.org/2000/svg","width":18,"height":18,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"text-gray-400","children":[["$","path","14b2ls",{"d":"M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"}],["$","path","7u93v4",{"d":"M7 7h.01"}],"$undefined"]}],["$","div",null,{"className":"flex space-x-2","children":[["$","span","PhysX",{"className":"bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm","children":"PhysX"}],["$","span","物理引擎",{"className":"bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm","children":"物理引擎"}],["$","span","碰撞检测",{"className":"bg-white/10 text-gray-200 px-3 py-1 rounded-full text-sm","children":"碰撞检测"}]]}]]}]]}]}],["$","section",null,{"className":"py-12","children":["$","div",null,{"className":"max-w-4xl mx-auto px-4 sm:px-6 lg:px-8","children":["$","div",null,{"className":"bg-black/40 rounded-3xl shadow-lg border border-white/10 p-8 glass-highlight glass-noise","children":["$","div",null,{"className":"prose max-w-none","children":[["$","h2",null,{"children":"PhysX物理引擎简介"}],["$","p",null,{"children":"PhysX是NVIDIA开发的实时物理引擎，广泛应用于游戏开发中。它提供了刚体动力学、 软体模拟、流体模拟、布料模拟等丰富的物理效果。本文将详细介绍如何在自研游戏引擎中集成PhysX。"}],["$","h3",null,{"children":"环境配置"}],["$","p",null,{"children":"首先需要下载并配置PhysX SDK："}],["$","ol",null,{"children":[["$","li",null,{"children":"从NVIDIA官网下载PhysX SDK"}],["$","li",null,{"children":"解压到项目目录"}],["$","li",null,{"children":"配置Visual Studio项目设置"}]]}],["$","$L9",null,{"code":"// 项目配置示例\n// 包含目录\n$(PhysXSDK)/Include\n$(PhysXSDK)/Include/common\n$(PhysXSDK)/Include/geometry\n$(PhysXSDK)/Include/foundation\n\n// 库目录\n$(PhysXSDK)/Lib/$(Platform)/$(Configuration)\n\n// 链接库\nPhysX_64.lib\nPhysXCommon_64.lib\nPhysXFoundation_64.lib\nPhysXExtensions_64.lib","language":"cpp","title":"PhysX项目配置"}],["$","h3",null,{"children":"PhysX初始化"}],["$","p",null,{"children":"创建PhysX的基础组件："}],["$","$L9",null,{"code":"$a","language":"cpp","title":"PhysX引擎初始化","showLineNumbers":true}],["$","h3",null,{"children":"创建刚体"}],["$","p",null,{"children":"PhysX中的刚体分为静态刚体和动态刚体："}],["$","$L9",null,{"code":"$b","language":"cpp","title":"创建刚体对象","showLineNumbers":true}],["$","h3",null,{"children":"物理模拟更新"}],["$","p",null,{"children":"在游戏主循环中更新物理模拟："}],["$","$L9",null,{"code":"$c","language":"cpp","title":"物理模拟更新","showLineNumbers":true}],["$","h3",null,{"children":"碰撞检测"}],["$","p",null,{"children":"PhysX提供了强大的碰撞检测功能："}],["$","$L9",null,{"code":"$d","language":"cpp","title":"碰撞检测回调","showLineNumbers":true}],["$","h3",null,{"children":"射线检测"}],["$","p",null,{"children":"射线检测在游戏中非常有用，比如鼠标拾取、武器射击等："}],["$","$L9",null,{"code":"// 射线检测\nbool Raycast(const physx::PxVec3& origin, \n             const physx::PxVec3& direction, \n             float maxDistance,\n             physx::PxRaycastHit& hit) {\n    physx::PxRaycastBuffer hitBuffer;\n    \n    bool hasHit = m_scene->raycast(origin, direction, maxDistance, hitBuffer);\n    \n    if (hasHit) {\n        hit = hitBuffer.block;\n        return true;\n    }\n    \n    return false;\n}\n\n// 使用示例\nphysx::PxVec3 rayOrigin(0, 10, 0);\nphysx::PxVec3 rayDirection(0, -1, 0);  // 向下\nphysx::PxRaycastHit hit;\n\nif (Raycast(rayOrigin, rayDirection, 20.0f, hit)) {\n    std::cout << \"Hit position: \" << hit.position.x << \", \" \n              << hit.position.y << \", \" << hit.position.z << std::endl;\n    std::cout << \"Hit distance: \" << hit.distance << std::endl;\n}","language":"cpp","title":"射线检测功能","showLineNumbers":true}],["$","h3",null,{"children":"性能优化建议"}],["$","p",null,{"children":"在使用PhysX时，需要注意以下性能优化点："}],["$","h4",null,{"children":"1. 合理设置物理更新频率"}],["$","p",null,{"children":"物理模拟不需要与渲染频率相同，通常60Hz就足够了。"}],["$","h4",null,{"children":"2. 使用简化的碰撞形状"}],["$","p",null,{"children":"尽量使用基本几何形状（盒子、球体、胶囊）而不是复杂的网格。"}],["$","h4",null,{"children":"3. 合理管理活跃对象"}],["$","p",null,{"children":"让不需要模拟的对象进入睡眠状态，减少计算负担。"}],["$","$L9",null,{"code":"// 设置睡眠阈值\ndynamicActor->setSleepThreshold(0.5f);\ndynamicActor->setStabilizationThreshold(0.1f);\n\n// 手动让对象睡眠\ndynamicActor->putToSleep();\n\n// 唤醒对象\ndynamicActor->wakeUp();","language":"cpp","title":"物理对象睡眠管理"}],["$","h3",null,{"children":"与渲染系统的集成"}],["$","p",null,{"children":"物理引擎需要与渲染系统紧密配合："}],["$","$L9",null,{"code":"class GameObject {\nprivate:\n    physx::PxRigidActor* m_physicsActor;\n    // 渲染相关数据\n    Mesh* m_mesh;\n    Material* m_material;\n    \npublic:\n    void Update() {\n        if (m_physicsActor) {\n            // 从物理引擎获取变换矩阵\n            DirectX::XMMATRIX worldMatrix = GetPhysicsTransform();\n            \n            // 更新渲染变换\n            UpdateRenderTransform(worldMatrix);\n        }\n    }\n    \n    void Render(ID3D11DeviceContext* context) {\n        // 使用更新后的变换矩阵进行渲染\n        // ...\n    }\n};","language":"cpp","title":"游戏对象与物理集成"}],["$","h3",null,{"children":"总结"}],["$","p",null,{"children":"PhysX为游戏开发提供了强大的物理模拟能力。通过合理的集成和优化， 可以为游戏带来逼真的物理效果。在实际项目中，还需要考虑多线程、 内存管理、调试工具等更多方面的问题。"}],["$","p",null,{"children":"掌握PhysX的使用不仅能提升游戏的真实感，也是现代游戏引擎开发的必备技能。 建议在学习过程中多做实验，理解各种参数对物理效果的影响。"}]]}]}]}]}],["$","section",null,{"className":"py-8 bg-black/40 border-t border-white/10","children":["$","div",null,{"className":"max-w-4xl mx-auto px-4 sm:px-6 lg:px-8","children":["$","div",null,{"className":"flex justify-between items-center","children":[["$","div",null,{"children":["$","$L8",null,{"href":"/blog/hlsl-shader-programming","className":"text-gray-200 hover:text-white transition-colors","children":"← 上一篇：HLSL着色器编程技巧"}]}],["$","div",null,{"children":["$","$L8",null,{"href":"/blog/directx11-rendering-pipeline","className":"text-gray-200 hover:text-white transition-colors","children":"下一篇：DirectX 11渲染管线深度解析 →"}]}]]}]}]}]]}],["$","footer",null,{"className":"bg-gray-900 border-t border-gray-700 mt-12","children":["$","div",null,{"className":"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8","children":["$","div",null,{"className":"text-center","children":[["$","p",null,{"className":"text-sm text-gray-400","children":["© ",2025," HGL博客 - 专注于游戏引擎开发技术分享"]}],["$","div",null,{"className":"mt-2 flex justify-center space-x-4","children":[["$","a",null,{"href":"https://github.com/hgl-pong","className":"text-gray-400 hover:text-white transition-colors text-sm","target":"_blank","rel":"noopener noreferrer","children":"GitHub"}],["$","span",null,{"className":"text-gray-600","children":"•"}],["$","a",null,{"href":"mailto:contact@example.com","className":"text-gray-400 hover:text-white transition-colors text-sm","children":"联系邮箱"}]]}]]}]}]}]],null],"segment":"__PAGE__"},"styles":null}],"segment":"physx-integration-guide"},"styles":null}],"segment":"blog"},"styles":null}]}]}]}],null]
-3:[["$","meta","0",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","1",{"charSet":"utf-8"}],["$","title","2",{"children":"HGL博客 - DirectX与PhysX游戏引擎开发"}],["$","meta","3",{"name":"description","content":"专注DirectX 11图形编程、PhysX物理引擎和C++游戏引擎开发技术分享，记录底层引擎开发心得"}],["$","meta","4",{"name":"author","content":"HGL"}],["$","meta","5",{"name":"keywords","content":"游戏引擎, DirectX 11, PhysX, C++, HLSL, 图形编程, 物理引擎, 游戏开发"}],["$","meta","6",{"property":"og:title","content":"HGL博客 - DirectX与PhysX游戏引擎开发"}],["$","meta","7",{"property":"og:description","content":"专注DirectX 11图形编程、PhysX物理引擎和C++游戏引擎开发技术分享，记录底层引擎开发心得"}],["$","meta","8",{"property":"og:url","content":"https://hgl-pong.github.io/"}],["$","meta","9",{"property":"og:type","content":"website"}],["$","meta","10",{"name":"twitter:card","content":"summary"}],["$","meta","11",{"name":"twitter:title","content":"HGL博客 - DirectX与PhysX游戏引擎开发"}],["$","meta","12",{"name":"twitter:description","content":"专注DirectX 11图形编程、PhysX物理引擎和C++游戏引擎开发技术分享，记录底层引擎开发心得"}],["$","link","13",{"rel":"icon","href":"/icon.ico?566750784894397f","type":"image/x-icon","sizes":"64x64"}]]
-6:null
+// Phong光照模型
+float4 CalculatePhongLighting(float3 worldPos, float3 normal, float3 lightDir, float3 viewDir)
+{
+    // 环境光
+    float3 ambient = float3(0.1, 0.1, 0.1);
+    
+    // 漫反射
+    float diff = max(dot(normal, lightDir), 0.0);
+    float3 diffuse = diff * float3(1.0, 1.0, 1.0);
+    
+    // 镜面反射
+    float3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    float3 specular = spec * float3(1.0, 1.0, 1.0);
+    
+    return float4(ambient + diffuse + specular, 1.0);
+}
+
+float4 main(PixelInput input) : SV_TARGET
+{
+    // 采样纹理
+    float4 texColor = diffuseTexture.Sample(linearSampler, input.texCoord);
+    
+    // 计算光照
+    float3 lightDir = normalize(-lightDirection);
+    float3 viewDir = normalize(cameraPosition - input.worldPos);
+    float4 lighting = CalculatePhongLighting(input.worldPos, input.normal, lightDir, viewDir);
+    
+    // 最终颜色
+    float4 finalColor = texColor * input.color * lighting;
+    finalColor.a = texColor.a;
+    
+    return finalColor;
+}2f:["DirectX 11","渲染管线","HLSL"]
+31:{"type":"heading","level":2,"id":"overview","text":"DirectX 11渲染管线概述"}
+32:{"type":"paragraph","text":"DirectX 11的渲染管线是现代图形编程的核心，它定义了从3D几何数据到最终像素输出的完整流程。理解渲染管线的每个阶段对于开发高性能的游戏引擎至关重要。"}
+33:{"type":"heading","level":3,"id":"stages","text":"渲染管线的主要阶段"}
+34:{"type":"paragraph","text":"DirectX 11渲染管线包含以下主要阶段："}
+36:["**输入装配器 (Input Assembler)** - 处理顶点数据和索引","**顶点着色器 (Vertex Shader)** - 变换顶点位置和属性","**曲面细分着色器 (Tessellation Shaders)** - 可选的几何细分","**几何着色器 (Geometry Shader)** - 可选的几何处理","**光栅化器 (Rasterizer)** - 将几何图形转换为像素","**像素着色器 (Pixel Shader)** - 计算最终像素颜色","**输出合并器 (Output Merger)** - 处理深度测试和混合"]
+35:{"type":"list","items":"$36"}
+37:{"type":"heading","level":3,"id":"input-assembler","text":"输入装配器阶段"}
+38:{"type":"paragraph","text":"输入装配器负责从内存中读取顶点数据，并将其组装成图元（如三角形、线段等）。这个阶段的配置直接影响渲染性能。"}
+39:{"type":"code","language":"cpp","code":"// 设置顶点缓冲区\nUINT stride = sizeof(Vertex);\nUINT offset = 0;\ndeviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);\n\n// 设置索引缓冲区\ndeviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);\n\n// 设置图元拓扑\ndeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);"}
+3a:{"type":"heading","level":3,"id":"vertex-shader","text":"顶点着色器阶段"}
+3b:{"type":"paragraph","text":"顶点着色器是可编程管线阶段，负责变换顶点位置、计算光照和纹理坐标。每个顶点都会执行一次顶点着色器程序。"}
+3c:{"type":"code","language":"hlsl","code":"// 顶点着色器示例\ncbuffer MatrixBuffer : register(b0)\n{\n    matrix worldMatrix;\n    matrix viewMatrix;\n    matrix projectionMatrix;\n};\n\nstruct VertexInput\n{\n    float4 position : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n};\n\nstruct VertexOutput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n};\n\nVertexOutput main(VertexInput input)\n{\n    VertexOutput output;\n    \n    // 变换顶点位置\n    float4 worldPos = mul(input.position, worldMatrix);\n    float4 viewPos = mul(worldPos, viewMatrix);\n    output.position = mul(viewPos, projectionMatrix);\n    \n    // 传递世界坐标和法线\n    output.worldPos = worldPos.xyz;\n    output.normal = mul(input.normal, (float3x3)worldMatrix);\n    output.texCoord = input.texCoord;\n    \n    return output;\n}"}
+3d:{"type":"heading","level":3,"id":"pixel-shader","text":"像素着色器阶段"}
+3e:{"type":"paragraph","text":"像素着色器计算每个像素的最终颜色。这是实现各种视觉效果的关键阶段，包括光照、纹理采样、材质计算等。"}
+3f:{"type":"code","language":"hlsl","code":"// 像素着色器示例\nTexture2D diffuseTexture : register(t0);\nSamplerState textureSampler : register(s0);\n\ncbuffer LightBuffer : register(b0)\n{\n    float3 lightDirection;\n    float lightIntensity;\n    float4 lightColor;\n};\n\nstruct PixelInput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n};\n\nfloat4 main(PixelInput input) : SV_TARGET\n{\n    // 采样漫反射纹理\n    float4 textureColor = diffuseTexture.Sample(textureSampler, input.texCoord);\n    \n    // 计算光照\n    float3 normalizedNormal = normalize(input.normal);\n    float lightFactor = max(dot(normalizedNormal, -lightDirection), 0.0f);\n    \n    // 计算最终颜色\n    float4 finalColor = textureColor * lightColor * lightFactor * lightIntensity;\n    finalColor.a = textureColor.a;\n    \n    return finalColor;\n}"}
+40:{"type":"heading","level":3,"id":"optimization","text":"性能优化技巧"}
+41:{"type":"paragraph","text":"优化DirectX 11渲染性能的关键技巧："}
+43:["**批处理** - 减少Draw Call数量","**实例化渲染** - 高效渲染大量相似对象","**纹理图集** - 减少纹理切换开销","**LOD系统** - 根据距离调整细节级别","**视锥剔除** - 避免渲染不可见对象"]
+42:{"type":"list","items":"$43"}
+44:{"type":"heading","level":3,"id":"summary","text":"总结"}
+45:{"type":"paragraph","text":"DirectX 11渲染管线为现代游戏开发提供了强大而灵活的图形渲染能力。深入理解每个阶段的工作原理和优化方法，是开发高性能游戏引擎的基础。通过合理的设计和优化，可以充分发挥现代GPU的计算能力。"}
+30:["$31","$32","$33","$34","$35","$37","$38","$39","$3a","$3b","$3c","$3d","$3e","$3f","$40","$41","$42","$44","$45"]
+47:{"title":"PhysX物理引擎集成实战","slug":"physx-integration-guide"}
+48:{"title":"HLSL着色器编程技巧","slug":"hlsl-shader-programming"}
+46:{"prev":"$47","next":"$48"}
+2e:{"id":"directx11-rendering-pipeline","title":"DirectX 11渲染管线深度解析","subtitle":"DirectX 11 Rendering Pipeline","category":"DirectX","author":"HGL","date":"2024-01-15","readTime":"10分钟","excerpt":"深入探讨DirectX 11的渲染管线架构，包括输入装配器、顶点着色器、像素着色器等各个阶段的详细实现，以及如何优化渲染性能...","tags":"$2f","featured":false,"published":true,"content":"$30","navigation":"$46"}
+4a:["HLSL","着色器","渲染"]
+4c:{"type":"heading","level":2,"id":"intro","text":"HLSL着色器编程简介"}
+4d:{"type":"paragraph","text":"HLSL（High-Level Shading Language）是微软开发的着色器语言，用于DirectX图形编程。它提供了强大的GPU编程能力，可以创建各种视觉效果，从简单的颜色变换到复杂的光照模型。"}
+4e:{"type":"heading","level":3,"id":"basics","text":"HLSL基础语法"}
+4f:{"type":"paragraph","text":"HLSL的语法与C语言类似，但有一些特殊的类型和关键字："}
+50:{"type":"code","language":"hlsl","code":"// 基本数据类型\nfloat4 position : POSITION;  // 4D浮点向量\nfloat3 normal : NORMAL;      // 3D浮点向量\nfloat2 texCoord : TEXCOORD0; // 2D浮点向量\nfloat4 color : COLOR;         // 颜色值\n\n// 矩阵类型\nfloat4x4 worldMatrix;\nfloat3x3 normalMatrix;\n\n// 常量缓冲区\ncbuffer MatrixBuffer : register(b0)\n{\n    float4x4 worldViewProj;\n    float4x4 worldMatrix;\n    float3 lightDirection;\n    float padding;\n};\n\n// 纹理和采样器\nTexture2D diffuseTexture : register(t0);\nSamplerState linearSampler : register(s0);"}
+51:{"type":"heading","level":3,"id":"vertex","text":"顶点着色器"}
+52:{"type":"paragraph","text":"顶点着色器处理每个顶点的数据，包括位置变换、法线计算、纹理坐标传递等："}
+53:{"type":"code","language":"hlsl","code":"// 顶点着色器示例\nstruct VertexInput\n{\n    float4 position : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n    float4 color : COLOR;\n};\n\nstruct VertexOutput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : TEXCOORD0;\n    float3 normal : TEXCOORD1;\n    float2 texCoord : TEXCOORD2;\n    float4 color : COLOR;\n};\n\nVertexOutput main(VertexInput input)\n{\n    VertexOutput output;\n    \n    // 变换位置到裁剪空间\n    output.position = mul(input.position, worldViewProj);\n    \n    // 计算世界坐标位置\n    output.worldPos = mul(input.position, worldMatrix).xyz;\n    \n    // 变换法线到世界空间\n    output.normal = normalize(mul(input.normal, (float3x3)worldMatrix));\n    \n    // 传递纹理坐标和颜色\n    output.texCoord = input.texCoord;\n    output.color = input.color;\n    \n    return output;\n}"}
+54:{"type":"heading","level":3,"id":"pixel","text":"像素着色器"}
+55:{"type":"paragraph","text":"像素着色器处理每个像素的颜色计算，包括纹理采样、光照计算、材质混合等："}
+57:T503,// 像素着色器示例
+struct PixelInput
+{
+    float4 position : SV_POSITION;
+    float3 worldPos : TEXCOORD0;
+    float3 normal : TEXCOORD1;
+    float2 texCoord : TEXCOORD2;
+    float4 color : COLOR;
+};
+
+// Phong光照模型
+float4 CalculatePhongLighting(float3 worldPos, float3 normal, float3 lightDir, float3 viewDir)
+{
+    // 环境光
+    float3 ambient = float3(0.1, 0.1, 0.1);
+    
+    // 漫反射
+    float diff = max(dot(normal, lightDir), 0.0);
+    float3 diffuse = diff * float3(1.0, 1.0, 1.0);
+    
+    // 镜面反射
+    float3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    float3 specular = spec * float3(1.0, 1.0, 1.0);
+    
+    return float4(ambient + diffuse + specular, 1.0);
+}
+
+float4 main(PixelInput input) : SV_TARGET
+{
+    // 采样纹理
+    float4 texColor = diffuseTexture.Sample(linearSampler, input.texCoord);
+    
+    // 计算光照
+    float3 lightDir = normalize(-lightDirection);
+    float3 viewDir = normalize(cameraPosition - input.worldPos);
+    float4 lighting = CalculatePhongLighting(input.worldPos, input.normal, lightDir, viewDir);
+    
+    // 最终颜色
+    float4 finalColor = texColor * input.color * lighting;
+    finalColor.a = texColor.a;
+    
+    return finalColor;
+}56:{"type":"code","language":"hlsl","code":"$57"}
+58:{"type":"heading","level":3,"id":"advanced","text":"高级着色器技术"}
+59:{"type":"paragraph","text":"HLSL还支持许多高级着色器技术，可以实现更复杂的视觉效果："}
+5a:{"type":"code","language":"hlsl","code":"// 法线贴图\nfloat3 CalculateNormalFromMap(float2 texCoord, float3 normal, float3 tangent)\n{\n    float3 normalMap = normalTexture.Sample(linearSampler, texCoord).rgb;\n    normalMap = normalMap * 2.0 - 1.0; // 转换到[-1,1]范围\n    \n    float3 bitangent = cross(normal, tangent);\n    float3x3 tbnMatrix = float3x3(tangent, bitangent, normal);\n    \n    return normalize(mul(normalMap, tbnMatrix));\n}\n\n// 视差贴图\nfloat2 CalculateParallaxOffset(float2 texCoord, float3 viewDir)\n{\n    float height = heightTexture.Sample(linearSampler, texCoord).r;\n    float2 offset = viewDir.xy * height * parallaxScale;\n    return texCoord - offset;\n}\n\n// 环境光遮蔽\nfloat CalculateAmbientOcclusion(float3 worldPos, float3 normal)\n{\n    float ao = 0.0;\n    float radius = 0.5;\n    int samples = 8;\n    \n    for (int i = 0; i < samples; i++) {\n        float3 samplePos = worldPos + randomDirection[i] * radius;\n        float depth = SampleDepth(samplePos);\n        ao += step(samplePos.z, depth);\n    }\n    \n    return 1.0 - (ao / samples);\n}"}
+5b:{"type":"heading","level":3,"id":"optimization","text":"性能优化"}
+5c:{"type":"paragraph","text":"着色器性能优化对游戏渲染性能至关重要："}
+5e:["**减少分支** - 避免在着色器中使用过多的if-else语句","**纹理压缩** - 使用BCn系列压缩格式减少带宽","**LOD系统** - 根据距离使用不同精度的着色器","**提前剔除** - 使用alpha test和depth test","**批处理** - 减少状态切换和draw call"]
+5d:{"type":"list","items":"$5e"}
+5f:{"type":"code","language":"hlsl","code":"// 优化示例：使用lerp替代if\n// 不好的做法\nif (factor > 0.5) {\n    result = color1;\n} else {\n    result = color2;\n}\n\n// 好的做法\nresult = lerp(color2, color1, step(0.5, factor));\n\n// 纹理采样优化\nfloat4 SampleTextureLOD(float2 texCoord, float lod)\n{\n    // 根据距离选择不同的纹理\n    if (lod < 0.5) {\n        return highResTexture.Sample(linearSampler, texCoord);\n    } else if (lod < 1.5) {\n        return medResTexture.Sample(linearSampler, texCoord);\n    } else {\n        return lowResTexture.Sample(linearSampler, texCoord);\n    }\n}\n\n// 计算着色器优化\n[numthreads(8, 8, 1)]\nvoid CSMain(uint3 id : SV_DispatchThreadID)\n{\n    // 共享内存优化\n    groupshared float sharedData[64];\n    \n    // 线程同步\n    GroupMemoryBarrierWithGroupSync();\n    \n    // 减少全局内存访问\n    float localValue = sharedData[id.x % 8 + id.y % 8 * 8];\n}"}
+60:{"type":"heading","level":3,"id":"summary","text":"总结"}
+61:{"type":"paragraph","text":"HLSL着色器编程是现代图形编程的核心技能。通过掌握HLSL的语法特性和优化技巧，可以创建出令人印象深刻的视觉效果。在实际开发中，需要根据具体需求选择合适的着色器技术，并在视觉效果和性能之间找到平衡。"}
+4b:["$4c","$4d","$4e","$4f","$50","$51","$52","$53","$54","$55","$56","$58","$59","$5a","$5b","$5c","$5d","$5f","$60","$61"]
+63:{"title":"DirectX 11渲染管线深度解析","slug":"directx11-rendering-pipeline"}
+64:{"title":"PhysX物理引擎集成实战","slug":"physx-integration-guide"}
+62:{"prev":"$63","next":"$64"}
+49:{"id":"hlsl-shader-programming","title":"HLSL着色器编程技巧","subtitle":"HLSL Shader Programming","category":"HLSL","author":"HGL","date":"2024-01-05","readTime":"12分钟","excerpt":"分享HLSL着色器开发中的实用技巧，包括顶点着色器、像素着色器的优化方法，以及常用的视觉效果实现...","tags":"$4a","featured":false,"published":true,"content":"$4b","navigation":"$62"}
+2d:["$2e","$49","$d"]
+2:[null,["$","html",null,{"lang":"zh-CN","children":["$","body",null,{"className":"cursor-none","children":[["$","$L4",null,{}],["$","div",null,{"className":"min-h-screen","children":["$","$L5",null,{"parallelRouterKey":"children","segmentPath":["children"],"loading":"$undefined","loadingStyles":"$undefined","loadingScripts":"$undefined","hasLoading":false,"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L6",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":"404"}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],"notFoundStyles":[],"childProp":{"current":["$","$L5",null,{"parallelRouterKey":"children","segmentPath":["children","blog","children"],"loading":"$undefined","loadingStyles":"$undefined","loadingScripts":"$undefined","hasLoading":false,"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L6",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","notFoundStyles":"$undefined","childProp":{"current":["$","$L5",null,{"parallelRouterKey":"children","segmentPath":["children","blog","children",["slug","physx-integration-guide","d"],"children"],"loading":"$undefined","loadingStyles":"$undefined","loadingScripts":"$undefined","hasLoading":false,"error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L6",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","notFoundStyles":"$undefined","childProp":{"current":["$L7",["$","$L8",null,{"children":[["$","$L9",null,{}],["$","main",null,{"className":"min-h-screen bg-gradient-to-br from-slate-50 to-white","children":[["$","div",null,{"className":"min-h-[60vh] flex items-center w-full bg-gradient-to-br from-white to-gray-50","children":["$","div",null,{"className":"max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8","children":["$","$La",null,{"post":{"id":"physx-integration-guide","title":"PhysX物理引擎集成实战","subtitle":"PhysX Integration Guide","category":"PhysX","author":"HGL","date":"2024-01-10","readTime":"12分钟","excerpt":"从零开始集成PhysX物理引擎到游戏项目中，包括刚体物理、碰撞检测、约束系统等核心功能的实现和优化技巧...","tags":["PhysX","物理引擎","碰撞检测"],"featured":false,"published":true,"content":[{"type":"heading","level":2,"id":"intro","text":"PhysX物理引擎简介"},{"type":"paragraph","text":"PhysX是NVIDIA开发的实时物理引擎，广泛应用于游戏开发中。它提供了刚体动力学、软体模拟、流体模拟、布料模拟等丰富的物理效果。本文将详细介绍如何在自研游戏引擎中集成PhysX。"},{"type":"heading","level":3,"id":"setup","text":"环境配置"},{"type":"paragraph","text":"首先需要下载并配置PhysX SDK："},{"type":"list","ordered":true,"items":["从NVIDIA官网下载PhysX SDK","解压到项目目录","配置Visual Studio项目设置"]},{"type":"code","language":"cpp","code":"// 项目配置示例\n// 包含目录\n$(PhysXSDK)/Include\n$(PhysXSDK)/Include/common\n$(PhysXSDK)/Include/geometry\n$(PhysXSDK)/Include/foundation\n\n// 库目录\n$(PhysXSDK)/Lib/$(Platform)/$(Configuration)\n\n// 链接库\nPhysX_64.lib\nPhysXCommon_64.lib\nPhysXFoundation_64.lib\nPhysXCooking_64.lib"},{"type":"heading","level":3,"id":"init","text":"初始化PhysX"},{"type":"paragraph","text":"PhysX的初始化包括创建基金会、物理系统、场景等核心组件："},{"type":"code","language":"cpp","code":"// PhysX初始化代码\n#include <PxPhysicsAPI.h>\n\nusing namespace physx;\n\nclass PhysicsManager {\nprivate:\n    PxFoundation* foundation;\n    PxPhysics* physics;\n    PxScene* scene;\n    PxDefaultAllocator allocator;\n    PxDefaultErrorCallback errorCallback;\n    \npublic:\n    bool Initialize() {\n        // 创建基金会\n        foundation = PxCreateFoundation(PX_PHYSICS_VERSION, allocator, errorCallback);\n        if (!foundation) return false;\n        \n        // 创建物理系统\n        physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, PxTolerancesScale());\n        if (!physics) return false;\n        \n        // 创建场景描述\n        PxSceneDesc sceneDesc(physics->getTolerancesScale());\n        sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);\n        sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(2);\n        sceneDesc.filterShader = PxDefaultSimulationFilterShader;\n        \n        // 创建场景\n        scene = physics->createScene(sceneDesc);\n        if (!scene) return false;\n        \n        return true;\n    }\n};"},{"type":"heading","level":3,"id":"rigidbody","text":"刚体物理"},{"type":"paragraph","text":"刚体是物理引擎中最基本的概念，它具有质量、速度、加速度等物理属性："},{"type":"code","language":"cpp","code":"// 创建刚体\nPxRigidDynamic* CreateDynamicBox(const PxVec3& position, const PxVec3& halfSize, float density) {\n    // 创建形状\n    PxShape* shape = physics->createShape(PxBoxGeometry(halfSize), *material);\n    \n    // 创建刚体\n    PxTransform transform(position);\n    PxRigidDynamic* body = physics->createRigidDynamic(transform);\n    body->attachShape(*shape);\n    \n    // 计算质量和惯性\n    PxRigidBodyExt::updateMassAndInertia(*body, density);\n    \n    // 添加到场景\n    scene->addActor(*body);\n    \n    return body;\n}\n\n// 创建静态物体\nPxRigidStatic* CreateStaticBox(const PxVec3& position, const PxVec3& halfSize) {\n    // 创建形状\n    PxShape* shape = physics->createShape(PxBoxGeometry(halfSize), *material);\n    \n    // 创建静态物体\n    PxTransform transform(position);\n    PxRigidStatic* body = physics->createRigidStatic(transform);\n    body->attachShape(*shape);\n    \n    // 添加到场景\n    scene->addActor(*body);\n    \n    return body;\n}"},{"type":"heading","level":3,"id":"collision","text":"碰撞检测"},{"type":"paragraph","text":"PhysX提供了强大的碰撞检测系统，包括碰撞形状、过滤器和碰撞回调："},{"type":"code","language":"cpp","code":"// 碰撞回调类\nclass CollisionCallback : public PxSimulationEventCallback {\npublic:\n    void onContact(const PxContactPairHeader& pairHeader, \n                   const PxContactPair* pairs, PxU32 nbPairs) override {\n        for (PxU32 i = 0; i < nbPairs; i++) {\n            const PxContactPair& cp = pairs[i];\n            \n            // 检查碰撞开始\n            if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND) {\n                std::cout << \"Collision detected!\" << std::endl;\n            }\n            \n            // 检查碰撞结束\n            if (cp.events & PxPairFlag::eNOTIFY_TOUCH_LOST) {\n                std::cout << \"Collision ended!\" << std::endl;\n            }\n        }\n    }\n    \n    // 其他回调函数...\n};\n\n// 设置碰撞过滤\nvoid SetupCollisionFiltering() {\n    PxFilterData filterData;\n    filterData.word0 = 0x1; // 类别1\n    filterData.word1 = 0x2; // 与类别2碰撞\n    \n    PxShape* shape = ...;\n    shape->setSimulationFilterData(filterData);\n}"},{"type":"heading","level":3,"id":"optimization","text":"性能优化"},{"type":"paragraph","text":"PhysX物理引擎的性能优化是游戏开发中的重要环节："},{"type":"list","items":["**批处理** - 减少物理模拟的调用次数","**LOD系统** - 根据距离调整物理精度","**睡眠机制** - 静止物体进入睡眠状态","**区域划分** - 使用空间分区优化碰撞检测","**多线程** - 利用多核CPU进行并行计算"]},{"type":"code","language":"cpp","code":"// 性能优化设置\nvoid OptimizePhysicsScene() {\n    // 设置时间步长\n    scene->setGravity(PxVec3(0.0f, -9.81f, 0.0f));\n    \n    // 启用睡眠机制\n    scene->setFlag(PxSceneFlag::eENABLE_CCD, true);\n    scene->setFlag(PxSceneFlag::eENABLE_ACTIVE_ACTORS, true);\n    \n    // 设置求解器迭代次数\n    scene->setSolverBatchSize(PxU32(50));\n    scene->setSolverIterationCount(4);\n    \n    // 启用连续碰撞检测\n    PxSetWarnOnDeprecatedAPI(true);\n}\n\n// 批处理物理更新\nvoid UpdatePhysics(float deltaTime) {\n    // 固定时间步长\n    const float fixedTimeStep = 1.0f / 60.0f;\n    accumulator += deltaTime;\n    \n    while (accumulator >= fixedTimeStep) {\n        scene->simulate(fixedTimeStep);\n        scene->fetchResults(true);\n        accumulator -= fixedTimeStep;\n    }\n}"},{"type":"heading","level":3,"id":"summary","text":"总结"},{"type":"paragraph","text":"PhysX物理引擎为游戏开发提供了强大而完整的物理模拟解决方案。通过合理的架构设计和性能优化，可以在游戏中实现逼真的物理效果。掌握PhysX的集成技术，是开发高质量3D游戏的重要技能。"}],"navigation":{"prev":{"title":"HLSL着色器编程技巧","slug":"hlsl-shader-programming"},"next":{"title":"DirectX 11渲染管线深度解析","slug":"directx11-rendering-pipeline"}}}}]}]}],["$","$Lb",null,{"variant":"professional","padding":"lg","children":["$","div",null,{"className":"max-w-7xl mx-auto","children":["$","div",null,{"className":"flex flex-col lg:flex-row gap-8","children":[["$","div",null,{"className":"flex-1 lg:max-w-4xl","children":["$","$Lc",null,{"post":"$d"}]}],["$","div",null,{"className":"lg:hidden w-full","children":["$","div",null,{"className":"space-y-6","children":[["$","$L2a",null,{"post":"$d"}],["$","$L2b",null,{"post":"$d","allPosts":[{"id":"directx11-rendering-pipeline","title":"DirectX 11渲染管线深度解析","subtitle":"DirectX 11 Rendering Pipeline","category":"DirectX","author":"HGL","date":"2024-01-15","readTime":"10分钟","excerpt":"深入探讨DirectX 11的渲染管线架构，包括输入装配器、顶点着色器、像素着色器等各个阶段的详细实现，以及如何优化渲染性能...","tags":["DirectX 11","渲染管线","HLSL"],"featured":false,"published":true,"content":[{"type":"heading","level":2,"id":"overview","text":"DirectX 11渲染管线概述"},{"type":"paragraph","text":"DirectX 11的渲染管线是现代图形编程的核心，它定义了从3D几何数据到最终像素输出的完整流程。理解渲染管线的每个阶段对于开发高性能的游戏引擎至关重要。"},{"type":"heading","level":3,"id":"stages","text":"渲染管线的主要阶段"},{"type":"paragraph","text":"DirectX 11渲染管线包含以下主要阶段："},{"type":"list","items":["**输入装配器 (Input Assembler)** - 处理顶点数据和索引","**顶点着色器 (Vertex Shader)** - 变换顶点位置和属性","**曲面细分着色器 (Tessellation Shaders)** - 可选的几何细分","**几何着色器 (Geometry Shader)** - 可选的几何处理","**光栅化器 (Rasterizer)** - 将几何图形转换为像素","**像素着色器 (Pixel Shader)** - 计算最终像素颜色","**输出合并器 (Output Merger)** - 处理深度测试和混合"]},{"type":"heading","level":3,"id":"input-assembler","text":"输入装配器阶段"},{"type":"paragraph","text":"输入装配器负责从内存中读取顶点数据，并将其组装成图元（如三角形、线段等）。这个阶段的配置直接影响渲染性能。"},{"type":"code","language":"cpp","code":"// 设置顶点缓冲区\nUINT stride = sizeof(Vertex);\nUINT offset = 0;\ndeviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);\n\n// 设置索引缓冲区\ndeviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);\n\n// 设置图元拓扑\ndeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);"},{"type":"heading","level":3,"id":"vertex-shader","text":"顶点着色器阶段"},{"type":"paragraph","text":"顶点着色器是可编程管线阶段，负责变换顶点位置、计算光照和纹理坐标。每个顶点都会执行一次顶点着色器程序。"},{"type":"code","language":"hlsl","code":"// 顶点着色器示例\ncbuffer MatrixBuffer : register(b0)\n{\n    matrix worldMatrix;\n    matrix viewMatrix;\n    matrix projectionMatrix;\n};\n\nstruct VertexInput\n{\n    float4 position : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n};\n\nstruct VertexOutput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n};\n\nVertexOutput main(VertexInput input)\n{\n    VertexOutput output;\n    \n    // 变换顶点位置\n    float4 worldPos = mul(input.position, worldMatrix);\n    float4 viewPos = mul(worldPos, viewMatrix);\n    output.position = mul(viewPos, projectionMatrix);\n    \n    // 传递世界坐标和法线\n    output.worldPos = worldPos.xyz;\n    output.normal = mul(input.normal, (float3x3)worldMatrix);\n    output.texCoord = input.texCoord;\n    \n    return output;\n}"},{"type":"heading","level":3,"id":"pixel-shader","text":"像素着色器阶段"},{"type":"paragraph","text":"像素着色器计算每个像素的最终颜色。这是实现各种视觉效果的关键阶段，包括光照、纹理采样、材质计算等。"},{"type":"code","language":"hlsl","code":"// 像素着色器示例\nTexture2D diffuseTexture : register(t0);\nSamplerState textureSampler : register(s0);\n\ncbuffer LightBuffer : register(b0)\n{\n    float3 lightDirection;\n    float lightIntensity;\n    float4 lightColor;\n};\n\nstruct PixelInput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n};\n\nfloat4 main(PixelInput input) : SV_TARGET\n{\n    // 采样漫反射纹理\n    float4 textureColor = diffuseTexture.Sample(textureSampler, input.texCoord);\n    \n    // 计算光照\n    float3 normalizedNormal = normalize(input.normal);\n    float lightFactor = max(dot(normalizedNormal, -lightDirection), 0.0f);\n    \n    // 计算最终颜色\n    float4 finalColor = textureColor * lightColor * lightFactor * lightIntensity;\n    finalColor.a = textureColor.a;\n    \n    return finalColor;\n}"},{"type":"heading","level":3,"id":"optimization","text":"性能优化技巧"},{"type":"paragraph","text":"优化DirectX 11渲染性能的关键技巧："},{"type":"list","items":["**批处理** - 减少Draw Call数量","**实例化渲染** - 高效渲染大量相似对象","**纹理图集** - 减少纹理切换开销","**LOD系统** - 根据距离调整细节级别","**视锥剔除** - 避免渲染不可见对象"]},{"type":"heading","level":3,"id":"summary","text":"总结"},{"type":"paragraph","text":"DirectX 11渲染管线为现代游戏开发提供了强大而灵活的图形渲染能力。深入理解每个阶段的工作原理和优化方法，是开发高性能游戏引擎的基础。通过合理的设计和优化，可以充分发挥现代GPU的计算能力。"}],"navigation":{"prev":{"title":"PhysX物理引擎集成实战","slug":"physx-integration-guide"},"next":{"title":"HLSL着色器编程技巧","slug":"hlsl-shader-programming"}}},{"id":"hlsl-shader-programming","title":"HLSL着色器编程技巧","subtitle":"HLSL Shader Programming","category":"HLSL","author":"HGL","date":"2024-01-05","readTime":"12分钟","excerpt":"分享HLSL着色器开发中的实用技巧，包括顶点着色器、像素着色器的优化方法，以及常用的视觉效果实现...","tags":["HLSL","着色器","渲染"],"featured":false,"published":true,"content":[{"type":"heading","level":2,"id":"intro","text":"HLSL着色器编程简介"},{"type":"paragraph","text":"HLSL（High-Level Shading Language）是微软开发的着色器语言，用于DirectX图形编程。它提供了强大的GPU编程能力，可以创建各种视觉效果，从简单的颜色变换到复杂的光照模型。"},{"type":"heading","level":3,"id":"basics","text":"HLSL基础语法"},{"type":"paragraph","text":"HLSL的语法与C语言类似，但有一些特殊的类型和关键字："},{"type":"code","language":"hlsl","code":"// 基本数据类型\nfloat4 position : POSITION;  // 4D浮点向量\nfloat3 normal : NORMAL;      // 3D浮点向量\nfloat2 texCoord : TEXCOORD0; // 2D浮点向量\nfloat4 color : COLOR;         // 颜色值\n\n// 矩阵类型\nfloat4x4 worldMatrix;\nfloat3x3 normalMatrix;\n\n// 常量缓冲区\ncbuffer MatrixBuffer : register(b0)\n{\n    float4x4 worldViewProj;\n    float4x4 worldMatrix;\n    float3 lightDirection;\n    float padding;\n};\n\n// 纹理和采样器\nTexture2D diffuseTexture : register(t0);\nSamplerState linearSampler : register(s0);"},{"type":"heading","level":3,"id":"vertex","text":"顶点着色器"},{"type":"paragraph","text":"顶点着色器处理每个顶点的数据，包括位置变换、法线计算、纹理坐标传递等："},{"type":"code","language":"hlsl","code":"// 顶点着色器示例\nstruct VertexInput\n{\n    float4 position : POSITION;\n    float3 normal : NORMAL;\n    float2 texCoord : TEXCOORD0;\n    float4 color : COLOR;\n};\n\nstruct VertexOutput\n{\n    float4 position : SV_POSITION;\n    float3 worldPos : TEXCOORD0;\n    float3 normal : TEXCOORD1;\n    float2 texCoord : TEXCOORD2;\n    float4 color : COLOR;\n};\n\nVertexOutput main(VertexInput input)\n{\n    VertexOutput output;\n    \n    // 变换位置到裁剪空间\n    output.position = mul(input.position, worldViewProj);\n    \n    // 计算世界坐标位置\n    output.worldPos = mul(input.position, worldMatrix).xyz;\n    \n    // 变换法线到世界空间\n    output.normal = normalize(mul(input.normal, (float3x3)worldMatrix));\n    \n    // 传递纹理坐标和颜色\n    output.texCoord = input.texCoord;\n    output.color = input.color;\n    \n    return output;\n}"},{"type":"heading","level":3,"id":"pixel","text":"像素着色器"},{"type":"paragraph","text":"像素着色器处理每个像素的颜色计算，包括纹理采样、光照计算、材质混合等："},{"type":"code","language":"hlsl","code":"$2c"},{"type":"heading","level":3,"id":"advanced","text":"高级着色器技术"},{"type":"paragraph","text":"HLSL还支持许多高级着色器技术，可以实现更复杂的视觉效果："},{"type":"code","language":"hlsl","code":"// 法线贴图\nfloat3 CalculateNormalFromMap(float2 texCoord, float3 normal, float3 tangent)\n{\n    float3 normalMap = normalTexture.Sample(linearSampler, texCoord).rgb;\n    normalMap = normalMap * 2.0 - 1.0; // 转换到[-1,1]范围\n    \n    float3 bitangent = cross(normal, tangent);\n    float3x3 tbnMatrix = float3x3(tangent, bitangent, normal);\n    \n    return normalize(mul(normalMap, tbnMatrix));\n}\n\n// 视差贴图\nfloat2 CalculateParallaxOffset(float2 texCoord, float3 viewDir)\n{\n    float height = heightTexture.Sample(linearSampler, texCoord).r;\n    float2 offset = viewDir.xy * height * parallaxScale;\n    return texCoord - offset;\n}\n\n// 环境光遮蔽\nfloat CalculateAmbientOcclusion(float3 worldPos, float3 normal)\n{\n    float ao = 0.0;\n    float radius = 0.5;\n    int samples = 8;\n    \n    for (int i = 0; i < samples; i++) {\n        float3 samplePos = worldPos + randomDirection[i] * radius;\n        float depth = SampleDepth(samplePos);\n        ao += step(samplePos.z, depth);\n    }\n    \n    return 1.0 - (ao / samples);\n}"},{"type":"heading","level":3,"id":"optimization","text":"性能优化"},{"type":"paragraph","text":"着色器性能优化对游戏渲染性能至关重要："},{"type":"list","items":["**减少分支** - 避免在着色器中使用过多的if-else语句","**纹理压缩** - 使用BCn系列压缩格式减少带宽","**LOD系统** - 根据距离使用不同精度的着色器","**提前剔除** - 使用alpha test和depth test","**批处理** - 减少状态切换和draw call"]},{"type":"code","language":"hlsl","code":"// 优化示例：使用lerp替代if\n// 不好的做法\nif (factor > 0.5) {\n    result = color1;\n} else {\n    result = color2;\n}\n\n// 好的做法\nresult = lerp(color2, color1, step(0.5, factor));\n\n// 纹理采样优化\nfloat4 SampleTextureLOD(float2 texCoord, float lod)\n{\n    // 根据距离选择不同的纹理\n    if (lod < 0.5) {\n        return highResTexture.Sample(linearSampler, texCoord);\n    } else if (lod < 1.5) {\n        return medResTexture.Sample(linearSampler, texCoord);\n    } else {\n        return lowResTexture.Sample(linearSampler, texCoord);\n    }\n}\n\n// 计算着色器优化\n[numthreads(8, 8, 1)]\nvoid CSMain(uint3 id : SV_DispatchThreadID)\n{\n    // 共享内存优化\n    groupshared float sharedData[64];\n    \n    // 线程同步\n    GroupMemoryBarrierWithGroupSync();\n    \n    // 减少全局内存访问\n    float localValue = sharedData[id.x % 8 + id.y % 8 * 8];\n}"},{"type":"heading","level":3,"id":"summary","text":"总结"},{"type":"paragraph","text":"HLSL着色器编程是现代图形编程的核心技能。通过掌握HLSL的语法特性和优化技巧，可以创建出令人印象深刻的视觉效果。在实际开发中，需要根据具体需求选择合适的着色器技术，并在视觉效果和性能之间找到平衡。"}],"navigation":{"prev":{"title":"DirectX 11渲染管线深度解析","slug":"directx11-rendering-pipeline"},"next":{"title":"PhysX物理引擎集成实战","slug":"physx-integration-guide"}}},"$d"]}]]}]}],["$","div",null,{"className":"hidden lg:block w-80","children":["$","div",null,{"className":"sticky top-24 space-y-6","children":[["$","$L2a",null,{"post":"$d"}],["$","$L2b",null,{"post":"$d","allPosts":"$2d"}]]}]}]]}]}]}],["$","$Lb",null,{"variant":"professional","padding":"lg","children":["$","div",null,{"className":"max-w-4xl mx-auto","children":["$","$L65",null,{"post":"$d"}]}]}]]}],["$","$L66",null,{}]]}],null],"segment":"__PAGE__?{\"slug\":\"physx-integration-guide\"}"},"styles":null}],"segment":["slug","physx-integration-guide","d"]},"styles":null}],"segment":"blog"},"styles":null}]}]]}]}],null]
+3:[["$","meta","0",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","1",{"charSet":"utf-8"}],["$","title","2",{"children":"PhysX物理引擎集成实战 - HGL技术博客"}],["$","meta","3",{"name":"description","content":"从零开始集成PhysX物理引擎到游戏项目中，包括刚体物理、碰撞检测、约束系统等核心功能的实现和优化技巧..."}],["$","meta","4",{"name":"author","content":"HGL"}],["$","meta","5",{"name":"keywords","content":"PhysX, 物理引擎, 碰撞检测"}],["$","meta","6",{"property":"og:title","content":"PhysX物理引擎集成实战"}],["$","meta","7",{"property":"og:description","content":"从零开始集成PhysX物理引擎到游戏项目中，包括刚体物理、碰撞检测、约束系统等核心功能的实现和优化技巧..."}],["$","meta","8",{"property":"og:type","content":"article"}],["$","meta","9",{"property":"article:published_time","content":"2024-01-10"}],["$","meta","10",{"property":"article:author","content":"HGL"}],["$","meta","11",{"property":"article:tag","content":"PhysX"}],["$","meta","12",{"property":"article:tag","content":"物理引擎"}],["$","meta","13",{"property":"article:tag","content":"碰撞检测"}],["$","meta","14",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","15",{"name":"twitter:title","content":"PhysX物理引擎集成实战"}],["$","meta","16",{"name":"twitter:description","content":"从零开始集成PhysX物理引擎到游戏项目中，包括刚体物理、碰撞检测、约束系统等核心功能的实现和优化技巧..."}],["$","link","17",{"rel":"icon","href":"/icon.ico?566750784894397f","type":"image/x-icon","sizes":"64x64"}]]
+7:null
