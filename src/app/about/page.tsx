@@ -69,6 +69,7 @@ export default function AboutPage() {
                   fill
                   className="object-cover"
                   priority
+                  loading="eager"
                 />
               </div>
               

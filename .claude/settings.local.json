@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+<<<<<<< HEAD
       "Bash(npm install tailwind-merge)",
       "Bash(npm run build)",
       "Bash(npm run export)",
@@ -11,6 +12,25 @@
       "Bash(npx tsc:*)",
       "Bash(npm run lint)",
       "Read(//d//**)"
+=======
+      "Bash(npm run build)",
+      "Bash(find:*)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run dev)",
+      "Bash(npx lighthouse:*)",
+      "Bash(npm run lint)",
+      "Bash(npx eslint:*)",
+      "Bash(npm init @eslint/config)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(npm run export)",
+      "Bash(node:*)",
+      "Bash(npm view:*)",
+      "Bash(del:*)",
+      "Bash(npm search:*)",
+      "Bash(npm info:*)"
+>>>>>>> bce29937a05acf4569f71decd093a1516cfd1e83
     ],
     "deny": [],
     "ask": []

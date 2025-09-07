@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: 'HGL博客 - DirectX与PhysX游戏引擎开发',
     description: '专注DirectX 11图形编程、PhysX物理引擎和C++游戏引擎开发技术分享，记录底层引擎开发心得',
     type: 'website',
+    url: 'https://hgl-pong.github.io',
   },
 }
 

@@ -8,48 +8,59 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#fafafa',
-          100: '#f5f5f5',
-          200: '#e5e5e5',
-          300: '#d4d4d4',
-          400: '#a3a3a3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717',
+        gray: {
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
         },
+        blue: {
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+        }
       },
       typography: {
         DEFAULT: {
           css: {
             maxWidth: 'none',
-            color: '#e5e5e5',
+            color: '#d1d5db',
             a: {
-              color: '#f3f4f6',
+              color: '#3b82f6',
+              '&:hover': {
+                color: '#2563eb',
+              },
             },
             strong: {
-              color: '#f3f4f6',
+              color: '#f9fafb',
             },
             h1: {
-              color: '#ffffff',
+              color: '#f9fafb',
+              fontWeight: '700',
             },
             h2: {
-              color: '#ffffff',
+              color: '#f9fafb',
+              fontWeight: '600',
             },
             h3: {
               color: '#f3f4f6',
+              fontWeight: '600',
             },
             h4: {
-              color: '#e5e5e5',
+              color: '#e5e7eb',
             },
             code: {
-              color: '#e5e5e5',
-              backgroundColor: '#111827',
-              padding: '0.25rem 0.375rem',
+              color: '#f9fafb',
+              backgroundColor: '#1f2937',
+              padding: '0.2rem 0.4rem',
               borderRadius: '0.25rem',
-              fontWeight: '600',
+              fontWeight: '500',
             },
             'code::before': {
               content: '""',
@@ -60,6 +71,8 @@ module.exports = {
             pre: {
               backgroundColor: '#1f2937',
               color: '#f9fafb',
+              borderRadius: '0.5rem',
+              padding: '1rem',
             },
             'pre code': {
               backgroundColor: 'transparent',

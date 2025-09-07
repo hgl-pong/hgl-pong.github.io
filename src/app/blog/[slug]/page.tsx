@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import BackToTop from '@/components/BackToTop'
 import PageTransition from '@/components/PageTransition'
 import Section from '@/components/ui/Section'
 import ArticleHeader from '@/components/blog/ArticleHeader'
@@ -111,7 +110,6 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         </Section>
       </main>
       <Footer />
-      <BackToTop />
     </PageTransition>
   )
 }
